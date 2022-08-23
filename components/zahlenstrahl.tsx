@@ -7,7 +7,9 @@ import dataHandler from './dataHandler';
 
 let a;
 let topBorder ;
+let topborderstring;
 let bottomBorder ;
+let bottomboderstring;
 let aGefunden = false;
 let includingBottom = false;
 let includingTop = false;
@@ -15,21 +17,6 @@ let includingGaps = false;
 let gaps ;//
 gaps= [] ;
 
-// async function LoadData(){
-
-//         // let data = getCookie("MyCookie");
-//          const data = cookieCutter.get('MyCookie');
-//          let dataTable = {
-//             table: []
-//         };
-//         if(data!=='{}'){
-//             dataTable = JSON.parse(data); 
-//             return dataTable;
-//         }else{
-//             console.log("Keine Daten vorhanden");
-//             return 0;
-//         }
-// }
 
 async function processDataTable(){
     const data = cookieCutter.get('MyCookie');
@@ -56,9 +43,11 @@ async function processDataTable(){
         if(typeof content ==='undefined'){
             alert("Can't load element from table!")
         }else{
-            // console.log("a " + content.op + content.val);
+            console.log("a " + content.op + content.val);
             let value;
             value = parseInt(content.val,10)
+            let rawData;
+            rawData = content.val;
             switch (content.op) {
             case '<':
                 //Wenn in topBorder 'min' steht, oder der gegenwärtige Wert kleiner, 
@@ -67,6 +56,8 @@ async function processDataTable(){
                 if(typeof topBorder!=='number' || topBorder>value){
                     topBorder = value;
                     includingTop = false;
+                }else{
+                    topborderstring=rawData;
                 }
                 break;
             case '>':
@@ -138,13 +129,11 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
     const lineDistance =top-bot;
     // top=top-breitederbalken;
   
-  https://github.com/jeremyholcombe/d3-interactive-number-line/blob/master/number-line.js
-
   svg
     .attr("width", w)
     .attr("height", h)
     .style("margin-top", 50)
-    .style("margin-bottom", 50)
+    .style("margin-bottom", 5)
     .style("margin-left", 50)
     .style("margin-right", 50)
     .style("background-color",rgb(196, 196, 196));
@@ -152,46 +141,61 @@ let obenoffen = true;
 let untenoffen = true;
 console.log("top " + topBorder);
 console.log("bot " + bottomBorder);
+let pushedTop = false;
+let pushedBot = false;
 for (let index = 0; index < 2; index++) {
 
     if (!isNaN(bottomBorder)) {
         untenoffen = false;
         console.log("unten geschlossen");
     }else{
-        if (!obenoffen) {
-            bot=topBorder-5; 
+        if (!obenoffen&&!pushedBot) {
+            if (includingGaps) {
+                const min = Math.min(...gaps);
+                bot=min-5; 
+            }else{
+                bot=topBorder-5; 
+            } 
             data.push(bot);   
+            console.log(" bot: " +bot +" in data gepusht länge: " + data.length );
+            pushedBot=true;
         }
     }
     if (!isNaN(topBorder)) {
         obenoffen = false;
         console.log("oben geschlossen");
     }else{
-        if (!untenoffen) {
-            top=bottomBorder+5; 
+        if (!untenoffen&&!pushedTop) {
+            if (includingGaps) {
+                const max = Math.max(...gaps);
+                top=max+5;
+            }else{
+                top=bottomBorder+5;
+            } 
             data.push(top); 
-            console.log(data +" " + data.length );
+            console.log(" top: " +top +" in data gepusht länge: " + data.length );
+            pushedTop=true;
         }
     }
     
 }
 
-
+console.log("obenoffen: " + obenoffen);
+console.log("untenoffen " + untenoffen);
+//Inhalte der Grafik werden erst generiert, wenn top und bot Zahlenwerte enthalten
     if(!isNaN(bot) && !isNaN(top)){
-
-
-
+    let tick = top-bot;
     let data2;
     data2 = [];
 
     data.sort(function(a, b) {
         return a + b;
     });
-    console.log(data +" " + data.length );
+    console.log("data: " + data +" " + data.length );
     gaps.sort(function(a, b) {
         return a - b;
     });
-    console.log(gaps +" " + gaps.length );
+    console.log("gaps: " + gaps +" " + gaps.length );
     let gapsLänge = gaps.length;
     let daten_false_order;
     daten_false_order = [];
@@ -212,21 +216,13 @@ for (let index = 0; index < 2; index++) {
         daten.push(daten_false_order.pop());
         
     }
+    daten.sort(function(a, b){return b-a});
 
     if(includingGaps){
         länge = daten.length/2;
     }else{
         länge=daten.length-1;
     }
-
-
-
-
-
-
-
-
-
 
     console.log("daten: "+ daten);
     console.log("länge: "+ länge);
@@ -235,41 +231,68 @@ for (let index = 0; index < 2; index++) {
         data2.push(daten.pop())
         let differenzStartEnde = Math.abs(top-bot);
         let startskaliert= 25+(data2[0]-bot)*((w/(differenzStartEnde)));
+        //was war der Gedankengang
         if (obenoffen) {
-            startskaliert /=startskaliert;
+            console.log("Frisch berechnet startskaliert: "+ startskaliert);
+            //startskaliert /=2;
         } 
-        let endeskaliert = (daten[daten.length-1]-bot)*((w/(differenzStartEnde)))-25;
+        let endeskaliert = (daten[daten.length-1]-bot)*((w/(differenzStartEnde)));
+        if (daten.length===1) {
+            endeskaliert -=25;
+        }
         let differenzStartEndelokal = Math.abs(endeskaliert - startskaliert);
         let stepskaliert = (differenzStartEndelokal)/(differenzStartEnde);
 
-        if (obenoffen) {
+        if (obenoffen&& (!includingGaps||index!=0)) {
             endeskaliert = w;
         }
-        if (untenoffen) {
+        if (untenoffen && (!includingGaps||index!=länge-1)) {
             startskaliert = 0;
         }
 
 
-
-        if(index===0 || index ===länge-2){
-            if(!includingTop&&!obenoffen){
+        console.log("Index = " + index);
+        console.log("länge = " + länge);
+        
+            if(index ===länge-1 && !includingTop &&!obenoffen){
                 endeskaliert -= stepskaliert/2;
                 console.log("oben nicht eingeschlossen")
             }
-            if(!includingBottom&&!untenoffen){
+            if(index===0 && !includingBottom&&!untenoffen){
                 startskaliert += stepskaliert/2;
                 console.log("unten nicht eingeschlossen")
             }
-        }else{
-            if(!obenoffen&&!untenoffen){
+            //Wenn es eine Lücke gibt
+            if (index !==länge-1 ) {
+                endeskaliert -= stepskaliert/2;
+            }            
+            if(index !==länge-1 && index!==0&&!obenoffen&&!untenoffen){
                 endeskaliert -= stepskaliert/2;
                 startskaliert += stepskaliert/2;
                 console.log("überall geschlossen und Mittelteil")
             }
-        }
+        
+
+         
+        // if(index===0 || index ===länge-1){
+        //     if(!includingTop&&!obenoffen){
+        //         endeskaliert -= stepskaliert/5;
+        //         console.log("oben nicht eingeschlossen")
+        //     }
+        //     if(!includingBottom&&!untenoffen){
+        //         startskaliert += stepskaliert/5;
+        //         console.log("unten nicht eingeschlossen")
+        //     }
+        // }else{
+        //     if(!obenoffen&&!untenoffen){
+        //         endeskaliert -= stepskaliert/5;
+        //         startskaliert += stepskaliert/5;
+        //         console.log("überall geschlossen und Mittelteil")
+        //     }
+        // }
 
 
-        let breiteSkaliert = Math.sqrt((endeskaliert - startskaliert)*(endeskaliert - startskaliert))
+        let breiteSkaliert = Math.abs(endeskaliert - startskaliert)
         
         console.log("daten: "+ daten);
         console.log("data2: "+ data2);
@@ -291,14 +314,14 @@ for (let index = 0; index < 2; index++) {
             .attr("height", 48)
             .attr("opacity", 50)
             .attr("fill", rgb(79, 189, 83));
-            if(!untenoffen){
+            if(!untenoffen||!(!includingGaps||index!=länge-1)){
             svg.append('path')
                 .attr('d', d3.line()([[startskaliert+10,2], [startskaliert, 2], [startskaliert, 50], [startskaliert+10, 50]]))
                 .attr('stroke', rgb(18, 128, 6))
                 .attr('stroke-width', 4)
                 .attr('fill', 'none');
             }
-            if(!obenoffen){
+            if(!obenoffen||!(!includingGaps||index!=0)){
                 svg.append('path')
                 .attr('d', d3.line()([[endeskaliert-10,2], [endeskaliert, 2], [endeskaliert, 50], [endeskaliert-10, 50]]))
                 .attr('stroke', rgb(18, 128, 6))
@@ -315,20 +338,34 @@ for (let index = 0; index < 2; index++) {
         .domain([bot, top])
         .range([25, w-25]);
         let xAxisGenerator = d3.axisBottom(x)
-        let tick = top-bot;
+        //let tick = top-bot;
+        console.log("Typ von bot: " + tick)
         if(tick>10){
             tick=10;
         }
         if(obenoffen){
-            tick=2;
-            let tickLabels = [bot,'∞'];
-            xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
-            xAxisGenerator.tickValues([bot,top]);
+            if (includingGaps) {
+                
+                // tick=3;
+                // xAxisGenerator.tickValues([bot,top]);
+            }else{
+                tick=2;
+                let tickLabels = [bot,'∞'];
+                xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
+                xAxisGenerator.tickValues([bot,top]);
+            }
         }else if (untenoffen) {
-            tick=2;
-            let tickLabels = ['∞',top];
-            xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
-            xAxisGenerator.tickValues([bot,top]);
+            if (includingGaps) {
+                
+                // tick=3;
+                // xAxisGenerator.tickValues([bot,top]);
+            }else{
+                tick=3;
+                let tickLabels = ['-∞',top];
+                xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
+                xAxisGenerator.tickValues([bot,top]);
+
+            }
             
         }
         xAxisGenerator.ticks(tick);

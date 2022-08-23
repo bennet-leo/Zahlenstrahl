@@ -14,9 +14,8 @@ export default function Home() {
         <title>Zahlenstrahl</title>
       </Head>
       <main className={styles.main}>
-          {/* <Chart /> */}
           <Zahlenstrahl />
-          {/* <CookiePrinter /> */}
+          <div>Definitionsbereich von a</div>
           <div>
             <label>a </label>
           <select id = "operator">
@@ -58,11 +57,11 @@ function showData(){
  function dataToJson() {
    let operator = document.getElementById("operator").value;
    let value = document.getElementById("value").value;
-    if( value.length !== 0){ //!isNaN(value)&&
+    if( !isNaN(value) && value.length !== 0 ){ //
     dataHandler(operator, value);
-  //  }else{
-  //   alert("Bitte eine Zahl eingeben.")
-  //   clear();
+   }else{
+    alert("Bitte eine Zahl eingeben.")
+    clear();
     }
 
   //  if(!isNaN(value)&& value.length !== 0){
@@ -72,7 +71,7 @@ function showData(){
   //   clear();
   //  }
 
-   //location.reload();
+   location.reload();
    showData();
  }
  function Vis(){

@@ -26,7 +26,7 @@ async function processDataTable(){
     if(data!=='{}'){
         dataTable = JSON.parse(data); 
     }else{
-        console.log("Keine Daten vorhanden");
+        // console.log("Keine Daten vorhanden");
         return 0;
     }
     let localTable = dataTable;
@@ -43,7 +43,7 @@ async function processDataTable(){
         if(typeof content ==='undefined'){
             alert("Can't load element from table!")
         }else{
-            console.log("a " + content.op + content.val);
+            // console.log("a " + content.op + content.val);
             let value;
             value = parseInt(content.val,10)
             let rawData;
@@ -89,6 +89,7 @@ async function processDataTable(){
                 
                 break;
             case '=':
+                console.log("A gefunden")
                 a=value;
                 aGefunden=true;
                 break;
@@ -102,10 +103,10 @@ async function processDataTable(){
             }
         }
     }
-    console.log("Top Border: " + topBorder + " including: " + includingTop )
-    console.log("Bot Border: " + bottomBorder + " including: " + includingBottom)
-    console.log("a: " + a + " gefunden: " + aGefunden)
-    console.log("gaps: " + gaps + " including: " + includingGaps)
+    // console.log("Top Border: " + topBorder + " including: " + includingTop )
+    // console.log("Bot Border: " + bottomBorder + " including: " + includingBottom)
+    // console.log("a: " + a + " gefunden: " + aGefunden)
+    // console.log("gaps: " + gaps + " including: " + includingGaps)
 }
 
 async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
@@ -137,17 +138,18 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
     .style("margin-left", 50)
     .style("margin-right", 50)
     .style("background-color",rgb(196, 196, 196));
+    if(!aGefunden){
 let obenoffen = true;
 let untenoffen = true;
-console.log("top " + topBorder);
-console.log("bot " + bottomBorder);
+ console.log("top " + topBorder);
+// console.log("bot " + bottomBorder);
 let pushedTop = false;
 let pushedBot = false;
 for (let index = 0; index < 2; index++) {
 
     if (!isNaN(bottomBorder)) {
         untenoffen = false;
-        console.log("unten geschlossen");
+        // console.log("unten geschlossen");
     }else{
         if (!obenoffen&&!pushedBot) {
             if (includingGaps) {
@@ -157,13 +159,13 @@ for (let index = 0; index < 2; index++) {
                 bot=topBorder-5; 
             } 
             data.push(bot);   
-            console.log(" bot: " +bot +" in data gepusht länge: " + data.length );
+            // console.log(" bot: " +bot +" in data gepusht länge: " + data.length );
             pushedBot=true;
         }
     }
     if (!isNaN(topBorder)) {
         obenoffen = false;
-        console.log("oben geschlossen");
+        // console.log("oben geschlossen");
     }else{
         if (!untenoffen&&!pushedTop) {
             if (includingGaps) {
@@ -173,15 +175,15 @@ for (let index = 0; index < 2; index++) {
                 top=bottomBorder+5;
             } 
             data.push(top); 
-            console.log(" top: " +top +" in data gepusht länge: " + data.length );
+            // console.log(" top: " +top +" in data gepusht länge: " + data.length );
             pushedTop=true;
         }
     }
     
 }
 
-console.log("obenoffen: " + obenoffen);
-console.log("untenoffen " + untenoffen);
+// console.log("obenoffen: " + obenoffen);
+// console.log("untenoffen " + untenoffen);
 //Inhalte der Grafik werden erst generiert, wenn top und bot Zahlenwerte enthalten
     if(!isNaN(bot) && !isNaN(top)){
     let tick = top-bot;
@@ -191,11 +193,11 @@ console.log("untenoffen " + untenoffen);
     data.sort(function(a, b) {
         return a + b;
     });
-    console.log("data: " + data +" " + data.length );
+    // console.log("data: " + data +" " + data.length );
     gaps.sort(function(a, b) {
         return a - b;
     });
-    console.log("gaps: " + gaps +" " + gaps.length );
+    // console.log("gaps: " + gaps +" " + gaps.length );
     let gapsLänge = gaps.length;
     let daten_false_order;
     daten_false_order = [];
@@ -224,8 +226,8 @@ console.log("untenoffen " + untenoffen);
         länge=daten.length-1;
     }
 
-    console.log("daten: "+ daten);
-    console.log("länge: "+ länge);
+    // console.log("daten: "+ daten);
+    // console.log("länge: "+ länge);
     for (let index = 0; index < länge; index++) {    
         
         data2.push(daten.pop())
@@ -233,7 +235,7 @@ console.log("untenoffen " + untenoffen);
         let startskaliert= 25+(data2[0]-bot)*((w/(differenzStartEnde)));
         //was war der Gedankengang
         if (obenoffen) {
-            console.log("Frisch berechnet startskaliert: "+ startskaliert);
+            // console.log("Frisch berechnet startskaliert: "+ startskaliert);
             //startskaliert /=2;
         } 
         let endeskaliert = (daten[daten.length-1]-bot)*((w/(differenzStartEnde)));
@@ -251,16 +253,16 @@ console.log("untenoffen " + untenoffen);
         }
 
 
-        console.log("Index = " + index);
-        console.log("länge = " + länge);
+        // console.log("Index = " + index);
+        // console.log("länge = " + länge);
         
             if(index ===länge-1 && !includingTop &&!obenoffen){
                 endeskaliert -= stepskaliert/2;
-                console.log("oben nicht eingeschlossen")
+                // console.log("oben nicht eingeschlossen")
             }
             if(index===0 && !includingBottom&&!untenoffen){
                 startskaliert += stepskaliert/2;
-                console.log("unten nicht eingeschlossen")
+                // console.log("unten nicht eingeschlossen")
             }
             //Wenn es eine Lücke gibt
             if (index !==länge-1 ) {
@@ -269,7 +271,7 @@ console.log("untenoffen " + untenoffen);
             if(index !==länge-1 && index!==0&&!obenoffen&&!untenoffen){
                 endeskaliert -= stepskaliert/2;
                 startskaliert += stepskaliert/2;
-                console.log("überall geschlossen und Mittelteil")
+                // console.log("überall geschlossen und Mittelteil")
             }
         
 
@@ -277,32 +279,32 @@ console.log("untenoffen " + untenoffen);
         // if(index===0 || index ===länge-1){
         //     if(!includingTop&&!obenoffen){
         //         endeskaliert -= stepskaliert/5;
-        //         console.log("oben nicht eingeschlossen")
+        //         // console.log("oben nicht eingeschlossen")
         //     }
         //     if(!includingBottom&&!untenoffen){
         //         startskaliert += stepskaliert/5;
-        //         console.log("unten nicht eingeschlossen")
+        //         // console.log("unten nicht eingeschlossen")
         //     }
         // }else{
         //     if(!obenoffen&&!untenoffen){
         //         endeskaliert -= stepskaliert/5;
         //         startskaliert += stepskaliert/5;
-        //         console.log("überall geschlossen und Mittelteil")
+        //         // console.log("überall geschlossen und Mittelteil")
         //     }
         // }
 
 
         let breiteSkaliert = Math.abs(endeskaliert - startskaliert)
         
-        console.log("daten: "+ daten);
-        console.log("data2: "+ data2);
-        console.log("w: "+ w);
-        console.log("differenzStartEnde: "+ differenzStartEnde);
-        console.log("differenzStartEndelokal: "+ differenzStartEndelokal);
-        console.log("startskaliert: "+ startskaliert);
-        console.log("endeskaliert: "+ endeskaliert);
-        console.log("breiteSkaliert: "+ breiteSkaliert);
-        console.log("stepskaliert: "+ stepskaliert);
+        // console.log("daten: "+ daten);
+        // console.log("data2: "+ data2);
+        // console.log("w: "+ w);
+        // console.log("differenzStartEnde: "+ differenzStartEnde);
+        // console.log("differenzStartEndelokal: "+ differenzStartEndelokal);
+        // console.log("startskaliert: "+ startskaliert);
+        // console.log("endeskaliert: "+ endeskaliert);
+        // console.log("breiteSkaliert: "+ breiteSkaliert);
+        // console.log("stepskaliert: "+ stepskaliert);
 
         svg.selectAll("rect"+länge)
             .data(daten)
@@ -339,7 +341,7 @@ console.log("untenoffen " + untenoffen);
         .range([25, w-25]);
         let xAxisGenerator = d3.axisBottom(x)
         //let tick = top-bot;
-        console.log("Typ von bot: " + tick)
+        // console.log("Typ von bot: " + tick)
         if(tick>10){
             tick=10;
         }
@@ -370,16 +372,65 @@ console.log("untenoffen " + untenoffen);
         }
         xAxisGenerator.ticks(tick);
         xAxisGenerator.tickSize(-5);
-
+    
         let xAxis =svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0,"+achsenHöhe+")")
             .call(xAxisGenerator);
-
+        
         xAxis.selectAll(".tick text")
             .attr("font-size","20")
             .attr("color","red")
+        }
+    }else{
+            console.log("a gefunden");
+            //Wenn a direkt eingegeben wird, kasten bei a zeichnen und fertig.
+            svg.selectAll("rect_a")
+                .data([1,2])
+                .enter()
+                .append("rect")
+                .attr("x", w/2-25)//(d, i) => 25+(d-bot)*((w/(top-bot))-breitederbalken))
+                .attr("y", 2)
+                .attr("y", 2)
+                .attr("width", 50)
+                .attr("height", 48)
+                .attr("opacity", 50)
+                .attr("fill", rgb(79, 189, 83));
 
+            svg.append('path')
+                .attr('d', d3.line()([[w/2-25+10,2], [w/2-25, 2], [w/2-25, 50], [w/2-25+10, 50]]))
+                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke-width', 4)
+                .attr('fill', 'none');
+
+            svg.append('path')
+                .attr('d', d3.line()([[w/2+25-10,2], [w/2+25, 2], [w/2+25, 50], [w/2+25-10, 50]]))
+                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke-width', 4)
+                .attr('fill', 'none');
+
+            let xScale = d3.scaleLinear()
+                .domain([a-1, a+1])
+                .range([0, w]);
+            let xAxisGenerator = d3.axisBottom(xScale);
+            xAxisGenerator.ticks(1);
+            xAxisGenerator.tickValues([a]);
+            xAxisGenerator.tickSize(-5);
+            
+            let tickLabels = [a];
+            xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
+            xAxisGenerator.tickValues([a]);
+
+            let xAxis =svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0,"+achsenHöhe+")")
+                .call(xAxisGenerator);
+        
+            xAxis.selectAll(".tick text")
+                .attr("font-size","20")
+                .attr("color","red")
+            
+            }
         svg.append('defs')
             .append('marker')
             .attr('id', 'arrow')
@@ -399,7 +450,7 @@ console.log("untenoffen " + untenoffen);
             .attr('marker-end', 'url(#arrow)')
             .attr('fill', 'none');
         }
-}
+
 
 const Zahlenstrahl: React.FunctionComponent = () => {
   const svg = React.useRef<SVGSVGElement>(null);

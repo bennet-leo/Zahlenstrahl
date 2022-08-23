@@ -14,7 +14,7 @@ export default function Home() {
         <title>Zahlenstrahl</title>
       </Head>
       <main className={styles.main}>
-          <Chart />
+          {/* <Chart /> */}
           <Zahlenstrahl />
           {/* <CookiePrinter /> */}
           <div>
@@ -35,6 +35,9 @@ export default function Home() {
           </div>
           <div>
             <button onClick={showData} >Daten Anzeigen</button>
+            </div>
+          <div>
+            <button onClick={Vis} >Visualiserung Anzeigen</button>
             </div>           
       </main>
     </div>    
@@ -55,16 +58,27 @@ function showData(){
  function dataToJson() {
    let operator = document.getElementById("operator").value;
    let value = document.getElementById("value").value;
-   if(!isNaN(value)&& value.length !== 0){
+    if( value.length !== 0){ //!isNaN(value)&&
     dataHandler(operator, value);
-   }else{
-    alert("Bitte eine Zahl eingeben.")
-    clear();
-   }
-   location.reload();
+  //  }else{
+  //   alert("Bitte eine Zahl eingeben.")
+  //   clear();
+    }
+
+  //  if(!isNaN(value)&& value.length !== 0){
+  //   dataHandler(operator, value);
+  //  }else{
+  //   alert("Bitte eine Zahl eingeben.")
+  //   clear();
+  //  }
+
+   //location.reload();
    showData();
  }
- 
+ function Vis(){
+  location.reload();
+ }
  function reset(){
    dataHandler('delete', 0);
+   location.reload();
  }

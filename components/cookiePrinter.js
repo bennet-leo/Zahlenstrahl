@@ -1,17 +1,21 @@
+import Layout from '../components/layout';
 import cookieCutter from 'cookie-cutter';
 
 function CookiePrinter() {
  var table = print();
  return table;
+//  return(
+//     <Layout print>    </Layout>
+//    )
 }
 
 export function CookieHtml(){
    return(
-            print()
+    <Layout>
+      <div>{print}</div>
+    </Layout>
    )
 }
-
-
 export default CookiePrinter;
 
 async function print(){
@@ -22,7 +26,7 @@ async function print(){
         if(data!=='{}'){
             obj = JSON.parse(data); 
         }else{
-            console.log("Cookie Anzeige abgebrochen");
+            console.log("Keine Daten eingegeben");
             return 0;
         }
         console.log("Anzahl der einträge: " + obj.table.length);
@@ -34,7 +38,7 @@ async function print(){
             k+= '<td>' + content.op + '</td>';
             k+= '<td>' + content.val + '</td>';
             k+= '</tr>';
-            console.log( "a " + content.op + ":" + content.val );
+            console.log( "a " + content.op + " " + content.val );
         }
         k+='</tbody>';
         // console.log(k);

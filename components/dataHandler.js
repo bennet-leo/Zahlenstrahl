@@ -1,6 +1,6 @@
 import cookieCutter from 'cookie-cutter';
 
-function addToCookie (operator, value){
+async function addToCookie (operator, value){
     
     let data = cookieCutter.get('MyCookie')
     let obj = {
@@ -10,7 +10,7 @@ function addToCookie (operator, value){
             if(data!=='{}'){
                 obj = JSON.parse(data); 
                 obj.table.push({op: operator, val : value});
-                console.log("read data from cookie and added new entry");
+                // console.log("read data from cookie and added new entry");
             }else{
                 obj = {
                     table: [{op: operator, val:value}]
@@ -24,15 +24,15 @@ function addToCookie (operator, value){
     let json = JSON.stringify(obj) ;
 
      cookieCutter.set('MyCookie', json)
-     printCookieContent("Daten hinzugefügt")
+    //  printCookieContent("Daten hinzugefügt")
 }
 
-function deleteCookie(){
+async function deleteCookie(){
     cookieCutter.set('MyCookie', '{}',);
     printCookieContent("Daten gelöscht")
 }
 
-function printCookieContent(string){
+async function printCookieContent(string){
     let data = cookieCutter.get('MyCookie')
     console.log("Cookie message: "+string+": " + data);
 }
@@ -48,7 +48,7 @@ function dataHandler(operator,value) {
 
 export default dataHandler;
 
-function print(value){
+async function print(value){
     let data2 = cookieCutter.get('MyCookie');
         let obj = {
             table: []

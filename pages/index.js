@@ -1,11 +1,11 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import Chart from '../components/chart.tsx'
 import dataHandler from '../components/dataHandler'
 import CookiePrinter from '../components/cookiePrinter'
 import Zahlenstrahl from '../components/zahlenstrahl.tsx'
+import { setCookieName } from '../components/zahlenstrahl.tsx'
 
-
+const Zahlenstrahl_1_name = "0001";
 export default function Home() {
 
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         <title>Zahlenstrahl</title>
       </Head>
       <main className={styles.main}>
-          <Zahlenstrahl />
+          <Zahlenstrahl  {...setCookieName(Zahlenstrahl_1_name)} />
           <div>Definitionsbereich von a</div>
           <div>
             <label>a </label>
@@ -29,22 +29,18 @@ export default function Home() {
           <input type="text" id="value" onClick={clear} />
           </div>
           <div>
-            <button onClick={dataToJson} >hinzufügen</button>
+            <button onClick={dataToJson(Zahlenstrahl_1_name)} >hinzufügen</button>
             <button onClick={reset} >reset</button>
-          </div>
-          <div>
             <button onClick={showData} >Daten Anzeigen</button>
-            </div>
-          <div>
-            <button onClick={Vis} >Visualiserung Anzeigen</button>
-            </div>           
+            <button onClick={Vis} >Visualiserung Anzeigen</button>         
+      </div>
       </main>
     </div>    
   )
 }
 
-function showData(){
-  var text = CookiePrinter();
+function showData(Cookiname){
+  var text = CookiePrinter(Cookiname);
   // var elem = document.getElementById("cookie");
   // elem.text = text;
 }
@@ -54,25 +50,15 @@ function showData(){
   inputField.value = "";
  }
 
- function dataToJson() {
+ function dataToJson(CookieName) {
    let operator = document.getElementById("operator").value;
    let value = document.getElementById("value").value;
     if( !isNaN(value) && value.length !== 0 ){ //
-    dataHandler(operator, value);
+      let text = dataHandler(operator, value,CookieName);
    }else{
     alert("Bitte eine Zahl eingeben.")
     clear();
     }
-
-  //  if(!isNaN(value)&& value.length !== 0){
-  //   dataHandler(operator, value);
-  //  }else{
-  //   alert("Bitte eine Zahl eingeben.")
-  //   clear();
-  //  }
-
-   location.reload();
-   showData();
  }
  function Vis(){
   location.reload();

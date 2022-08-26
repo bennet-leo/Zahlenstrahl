@@ -1,7 +1,10 @@
 import Layout from '../components/layout';
 import cookieCutter from 'cookie-cutter';
 
-function CookiePrinter() {
+let Cookiename;
+
+function CookiePrinter(name) {
+    Cookiename = name;
  var table = print();
  return table;
 //  return(
@@ -19,7 +22,8 @@ export function CookieHtml(){
 export default CookiePrinter;
 
 async function print(){
-    let data = cookieCutter.get('MyCookie');
+    console.log(Cookiename);
+    let data = cookieCutter.get(Cookiename);
         let obj = {
             table: []
         };

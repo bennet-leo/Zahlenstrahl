@@ -4,7 +4,7 @@ import cookieCutter from 'cookie-cutter';
 import { rgb } from 'd3';
 import dataHandler from './dataHandler';
 
-
+let Cookiename = "Zahlenstrahl_02";
 let a;
 let topBorder ;
 let topborderstring;
@@ -17,13 +17,26 @@ let includingGaps = false;
 let gaps ;//
 gaps= [] ;
 
+export async function setCookieName(Name){
+    Cookiename=Name;
+}
 
 async function processDataTable(){
-    const data = cookieCutter.get('MyCookie');
-    let dataTable = {
+    let data = cookieCutter.get(Cookiename);
+     console.log(typeof Cookiename);
+    //Wenn initial geladen wird, muss der Cookie erst gesetzt werden.
+    if (typeof data==='undefined') {
+        // Cookiename='MyCookie';
+    cookieCutter.set(Cookiename, '{}',);
+    data = cookieCutter.get(Cookiename);
+    }else{
+        
+    }
+    let dataTable;
+    dataTable = {
         table: []
     };    
-    if(data!=='{}'){
+    if(data!=='{}'&&typeof Cookiename!=='undefined'){
         dataTable = JSON.parse(data); 
     }else{
         // console.log("Keine Daten vorhanden");
@@ -110,8 +123,11 @@ async function processDataTable(){
 }
 
 async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
-    let h = 60;
-    let w = 600;
+    const h = 60;
+    const w = 600;
+    const green =       '#4fbd53';
+    const dark_green =  '#128006';
+    const gray =        '#b5b5b5';
     const achsenHöhe = h-20;
     const breitederbalken = 0;
     const svg = d3.select(svgRef.current);
@@ -119,6 +135,10 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
     data = [];
     let bot ;
     let top ;
+
+
+
+
     if(typeof topBorder === 'number'){
         data.push(topBorder);
         top=topBorder;
@@ -129,7 +149,6 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
     }
     const lineDistance =top-bot;
     // top=top-breitederbalken;
-  
   svg
     .attr("width", w)
     .attr("height", h)
@@ -137,11 +156,11 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>) {
     .style("margin-bottom", 5)
     .style("margin-left", 50)
     .style("margin-right", 50)
-    .style("background-color",rgb(196, 196, 196));
+    .style("background-color",gray);
     if(!aGefunden){
 let obenoffen = true;
 let untenoffen = true;
- console.log("top " + topBorder);
+//  console.log("top " + topBorder);
 // console.log("bot " + bottomBorder);
 let pushedTop = false;
 let pushedBot = false;
@@ -315,18 +334,18 @@ for (let index = 0; index < 2; index++) {
             .attr("width", breiteSkaliert)
             .attr("height", 48)
             .attr("opacity", 50)
-            .attr("fill", rgb(79, 189, 83));
+            .attr("fill", green);//rgb(r:79, g:189, b:83,opacity:1));
             if(!untenoffen||!(!includingGaps||index!=länge-1)){
             svg.append('path')
                 .attr('d', d3.line()([[startskaliert+10,2], [startskaliert, 2], [startskaliert, 50], [startskaliert+10, 50]]))
-                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke', dark_green)
                 .attr('stroke-width', 4)
                 .attr('fill', 'none');
             }
             if(!obenoffen||!(!includingGaps||index!=0)){
                 svg.append('path')
                 .attr('d', d3.line()([[endeskaliert-10,2], [endeskaliert, 2], [endeskaliert, 50], [endeskaliert-10, 50]]))
-                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke', dark_green)
                 .attr('stroke-width', 4)
                 .attr('fill', 'none');
             }
@@ -395,17 +414,17 @@ for (let index = 0; index < 2; index++) {
                 .attr("width", 50)
                 .attr("height", 48)
                 .attr("opacity", 50)
-                .attr("fill", rgb(79, 189, 83));
+                .attr("fill", green);
 
             svg.append('path')
                 .attr('d', d3.line()([[w/2-25+10,2], [w/2-25, 2], [w/2-25, 50], [w/2-25+10, 50]]))
-                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke', dark_green)
                 .attr('stroke-width', 4)
                 .attr('fill', 'none');
 
             svg.append('path')
                 .attr('d', d3.line()([[w/2+25-10,2], [w/2+25, 2], [w/2+25, 50], [w/2+25-10, 50]]))
-                .attr('stroke', rgb(18, 128, 6))
+                .attr('stroke', dark_green)
                 .attr('stroke-width', 4)
                 .attr('fill', 'none');
 

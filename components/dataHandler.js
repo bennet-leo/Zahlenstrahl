@@ -1,8 +1,6 @@
 import cookieCutter from 'cookie-cutter';
 
-let Cookiename;
-
-async function addToCookie (operator, value){
+async function addToCookie (operator, value, Cookiename){
     
     let data = cookieCutter.get(Cookiename)
     let obj = {
@@ -29,8 +27,8 @@ async function addToCookie (operator, value){
     //  printCookieContent("Daten hinzugefügt")
 }
 
-async function deleteCookie(){
-    cookieCutter.set(Cookiename, '{}',);
+async function deleteCookie(name){
+    cookieCutter.set(name, '{}',);
     printCookieContent("Daten gelöscht")
 }
 
@@ -41,12 +39,11 @@ async function printCookieContent(string){
 
 function dataHandler(operator,value,name) {
     if(operator==="delete"){
-        deleteCookie();
+        deleteCookie(name);
     }else{
-        Cookiename = name;
-        addToCookie(operator , value)
+        addToCookie(operator , value, name)
     }
-    console.log(Cookiename)
+    console.log(name)
     return ( 0);
 
 }

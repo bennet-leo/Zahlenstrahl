@@ -4,8 +4,7 @@ import cookieCutter from 'cookie-cutter';
 let Cookiename;
 
 function CookiePrinter(name) {
-    Cookiename = name;
- var table = print();
+ var table = print(name);
  return table;
 //  return(
 //     <Layout print>    </Layout>
@@ -21,13 +20,14 @@ export function CookieHtml(){
 }
 export default CookiePrinter;
 
-async function print(){
+async function print(Cookiename){
     console.log(Cookiename);
-    let data = cookieCutter.get(Cookiename);
+    let data ;
+    data = cookieCutter.get(Cookiename);
         let obj = {
             table: []
         };
-        if(data!=='{}'){
+        if(data!=='{}'&&typeof data!=='undefined'){
             obj = JSON.parse(data); 
         }else{
             console.log("Keine Daten eingegeben");

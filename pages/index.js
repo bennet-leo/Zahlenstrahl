@@ -4,10 +4,11 @@ import dataHandler from '../components/dataHandler'
 import CookiePrinter from '../components/cookiePrinter'
 import Zahlenstrahl from '../components/zahlenstrahl.tsx'
 import { setCookieName } from '../components/zahlenstrahl.tsx'
+import Zlstrl from '../components/zahlenstrahl_module'
 
 const Zahlenstrahl_1_name = "0001";
 const Zahlenstrahl_2_name = "0002";
-var z1 = <Zahlenstrahl name={Zahlenstrahl_1_name} id='0' />;
+// var z1 = <Zahlenstrahl name={Zahlenstrahl_1_name} id='0' />;
 export default function Home() {
 
   return (
@@ -67,8 +68,11 @@ export default function Home() {
             <button onClick={() => Vis(Zahlenstrahl_2_name)} >Visualiserung Anzeigen</button>     
           </div>
       </div>
+    {/* <div><Zlstrl name='0003'/></div> */}
       </main>
-    </div>    
+    </div>   
+    
+    
   )
 }
 

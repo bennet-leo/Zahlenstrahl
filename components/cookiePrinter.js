@@ -6,9 +6,6 @@ let Cookiename;
 function CookiePrinter(name) {
  var table = print(name);
  return table;
-//  return(
-//     <Layout print>    </Layout>
-//    )
 }
 
 export function CookieHtml(){
@@ -45,7 +42,6 @@ async function print(Cookiename){
             console.log( "a " + content.op + " " + content.val );
         }
         k+='</tbody>';
-        // console.log(k);
     return ( 
          k
      );

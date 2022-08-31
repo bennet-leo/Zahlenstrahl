@@ -1,33 +1,6 @@
 import * as React from 'react';
 import * as d3 from "d3";
 import cookieCutter from 'cookie-cutter';
-// import { rgb } from 'd3';
-// import dataHandler from './dataHandler';
-
-// let Cookiename;
-// let a;
-// let topBorder ;
-// let topborderstring;
-// let bottomBorder ;
-// let bottomboderstring;
-// let aGefunden = false;
-// let includingBottom = false;
-// let includingTop = false;
-// let includingGaps = false;
-// let gaps ;//
-// gaps= [] ;
-
-// let daten_gb ={
-//     a :'undefined',
-//     topBorder :'undefined',
-//     bottomBorder :'undefined',
-//     aGefunden : false,
-//     includingBottom : false,
-//     includingTop : false,
-//     includingGaps : false,
-//     nichtDefiniert : false,
-//     gaps : []
-// }
 
 async function processDataTable(Cookiename){
 
@@ -47,14 +20,16 @@ async function processDataTable(Cookiename){
     let gaps;
     gaps= [] ;
     let data;
-    data = cookieCutter.get(Cookiename);
-   console.log("Cookiename "+typeof Cookiename + " " + Cookiename);
-   console.log("data "+typeof data + " " + data);
+    var cookie = require('cookie-cutter');
+    // cookieCutter = require('cookie-cutter');
+    data = cookie.get(Cookiename);
+   // console.log("Cookiename "+typeof Cookiename + " " + Cookiename);
+   // console.log("data "+typeof data + " " + data);
     //Wenn initial geladen wird, muss der Cookie erst gesetzt werden.
     if (typeof data==='undefined') {
         // Cookiename='MyCookie';
-    cookieCutter.set(Cookiename, '{}',);
-    data = cookieCutter.get(Cookiename);
+    cookie.set(Cookiename, '{}',);
+    data = cookie.get(Cookiename);
     }else{
         // return 0;
     }
@@ -65,7 +40,7 @@ async function processDataTable(Cookiename){
     if(data!=='{}'&&typeof Cookiename!=='undefined'){
         dataTable = JSON.parse(data); 
     }else{
-      console.log("Keine Daten vorhanden");
+      // console.log("Keine Daten vorhanden");
         return 0;
     }
     let localTable = dataTable;
@@ -82,7 +57,7 @@ async function processDataTable(Cookiename){
         if(typeof content ==='undefined'){
             alert("Can't load element from table!")
         }else{
-           console.log("a " + content.op + content.val);
+           // console.log("a " + content.op + content.val);
             let value;
             value = parseInt(content.val,10)
             let rawData;
@@ -126,7 +101,7 @@ async function processDataTable(Cookiename){
                 
                 break;
             case '=':
-              console.log("A gefunden")
+              // console.log("A gefunden")
               daten.a=value;
             //   daten.aGefunden=true;
             if(typeof daten.topBorder!=='number' || daten.topBorder>value){
@@ -153,10 +128,10 @@ async function processDataTable(Cookiename){
         daten.nichtDefiniert = true;
     }
 
-console.log("Top Border: " + daten.topBorder + " including: " + daten.includingTop )
-console.log("Bot Border: " + daten.bottomBorder + " including: " + daten.includingBottom)
-console.log("a: " + daten.a + " gefunden: " + daten.aGefunden)
-console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
+// console.log("Top Border: " + daten.topBorder + " including: " + daten.includingTop )
+// console.log("Bot Border: " + daten.bottomBorder + " including: " + daten.includingBottom)
+// console.log("a: " + daten.a + " gefunden: " + daten.aGefunden)
+// console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
   return daten;
 }
 
@@ -177,8 +152,8 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
 
             let tabledata = processDataTable(name);
             datenStruct = await tabledata.then();
-           console.log(datenStruct);
-           console.log(datenStruct.topborder)
+           // console.log(datenStruct);
+           // console.log(datenStruct.topborder)
 
             let a = datenStruct.a;
             let topBorder  = datenStruct.topBorder;
@@ -194,7 +169,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
 
 
             let Cookiename = name;
-         console.log("DrawSVG gestartet für " + Cookiename + "und Name: " + name);
+         // console.log("DrawSVG gestartet für " + Cookiename + "und Name: " + name);
             const h = 60;
             const w = 600;
             const green =       '#4fbd53';
@@ -211,8 +186,8 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
         
         
         
-            console.log(typeof topBorder + " top border "+ topBorder)
-            console.log(typeof bottomBorder + " bot border "+ bottomBorder)
+            // console.log(typeof topBorder + " top border "+ topBorder)
+            // console.log(typeof bottomBorder + " bot border "+ bottomBorder)
             if(typeof topBorder === 'number'){
                 data.push(topBorder);
                 top=topBorder;
@@ -236,15 +211,15 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
             if(!aGefunden){
         let obenoffen = true;
         let untenoffen = true;
-       console.log("top " + topBorder);
-       console.log("bot " + bottomBorder);
+       // console.log("top " + topBorder);
+       // console.log("bot " + bottomBorder);
         let pushedTop = false;
         let pushedBot = false;
         for (let index = 0; index < 2; index++) {
         
             if (!isNaN(bottomBorder)) {
                 untenoffen = false;
-                console.log("unten geschlossen");
+                // console.log("unten geschlossen");
             }else{
                 if (!obenoffen&&!pushedBot) {
                     if (includingGaps) {
@@ -254,13 +229,13 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                         bot=topBorder-5; 
                     } 
                     data.push(bot);   
-                    console.log(" bot: " +bot +" in data gepusht länge: " + data.length );
+                    // console.log(" bot: " +bot +" in data gepusht länge: " + data.length );
                     pushedBot=true;
                 }
             }
             if (!isNaN(topBorder)) {
                 obenoffen = false;
-                console.log("oben geschlossen");
+                // console.log("oben geschlossen");
             }else{
                 if (!untenoffen&&!pushedTop) {
                     if (includingGaps) {
@@ -270,15 +245,15 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                         top=bottomBorder+5;
                     } 
                     data.push(top); 
-                    console.log(" top: " +top +" in data gepusht länge: " + data.length );
+                    // console.log(" top: " +top +" in data gepusht länge: " + data.length );
                     pushedTop=true;
                 }
             }
             
         }
         
-        console.log("obenoffen: " + obenoffen);
-        console.log("untenoffen " + untenoffen);
+        // console.log("obenoffen: " + obenoffen);
+        // console.log("untenoffen " + untenoffen);
         //Inhalte der Grafik werden erst generiert, wenn top und bot Zahlenwerte enthalten
             if(!isNaN(bot) && !isNaN(top)){
             let tick = top-bot;
@@ -288,11 +263,11 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
             data.sort(function(a, b) {
                 return a + b;
             });
-            console.log("data: " + data +" " + data.length );
+            // console.log("data: " + data +" " + data.length );
             gaps.sort(function(a, b) {
                 return a - b;
             });
-            console.log("gaps: " + gaps +" " + gaps.length );
+            // console.log("gaps: " + gaps +" " + gaps.length );
             let gapsLänge = gaps.length;
             let daten_false_order;
             daten_false_order = [];
@@ -345,9 +320,9 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 }
         
         
-                console.log("daten: "+ daten);
-                console.log("länge: "+ länge);
-                console.log("intervalllänge: "+ intervalllänge);
+                // console.log("daten: "+ daten);
+                // console.log("länge: "+ länge);
+                // console.log("intervalllänge: "+ intervalllänge);
                 //wenn nur ein Wert im Array vorhanden ist
                 // if(intervalllänge===0 && !nichtDefiniert){
                 //     // startskaliert -= stepskaliert/3;
@@ -356,17 +331,17 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 //     endeskaliert = w/2-25;
                 //     bot = a-1;
                 //     top = a+1
-                //     console.log("Daten manipuliert! ");
+                //     // console.log("Daten manipuliert! ");
                 // }
-                // console.log("Index = " + index);
+                   // console.log("Index = " + index);
                 
                     if(index ===länge-1 && !includingTop &&!obenoffen){
                         endeskaliert -= stepskaliert/2;
-                        console.log("oben nicht eingeschlossen")
+                        // console.log("oben nicht eingeschlossen")
                     }
                     if(index===0 && !includingBottom&&!untenoffen){
                         startskaliert += stepskaliert/2;
-                        console.log("unten nicht eingeschlossen")
+                        // console.log("unten nicht eingeschlossen")
                     }
                     //Wenn es eine Lücke gibt
                     if (index !==länge-1 ) {
@@ -375,7 +350,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                     if(index !==länge-1 && index!==0&&!obenoffen&&!untenoffen){
                         endeskaliert -= stepskaliert/2;
                         startskaliert += stepskaliert/2;
-                        console.log("überall geschlossen und Mittelteil")
+                        // console.log("überall geschlossen und Mittelteil")
                     }
                 
         
@@ -383,32 +358,32 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 // if(index===0 || index ===länge-1){
                 //     if(!includingTop&&!obenoffen){
                 //         endeskaliert -= stepskaliert/5;
-                //         console.log("oben nicht eingeschlossen")
+                //         // console.log("oben nicht eingeschlossen")
                 //     }
                 //     if(!includingBottom&&!untenoffen){
                 //         startskaliert += stepskaliert/5;
-                //         console.log("unten nicht eingeschlossen")
+                //         // console.log("unten nicht eingeschlossen")
                 //     }
                 // }else{
                 //     if(!obenoffen&&!untenoffen){
                 //         endeskaliert -= stepskaliert/5;
                 //         startskaliert += stepskaliert/5;
-                //         console.log("überall geschlossen und Mittelteil")
+                //         // console.log("überall geschlossen und Mittelteil")
                 //     }
                 // }
         
         
                 let breiteSkaliert = Math.abs(endeskaliert - startskaliert)
                 
-             console.log("daten: "+ daten);
-             console.log("data2: "+ data2);
-             console.log("w: "+ w);
-             console.log("differenzStartEnde: "+ differenzStartEnde);
-             console.log("differenzStartEndelokal: "+ differenzStartEndelokal);
-             console.log("startskaliert: "+ startskaliert);
-             console.log("endeskaliert: "+ endeskaliert);
-             console.log("breiteSkaliert: "+ breiteSkaliert);
-             console.log("stepskaliert: "+ stepskaliert);
+             // console.log("daten: "+ daten);
+             // console.log("data2: "+ data2);
+             // console.log("w: "+ w);
+             // console.log("differenzStartEnde: "+ differenzStartEnde);
+             // console.log("differenzStartEndelokal: "+ differenzStartEndelokal);
+             // console.log("startskaliert: "+ startskaliert);
+             // console.log("endeskaliert: "+ endeskaliert);
+             // console.log("breiteSkaliert: "+ breiteSkaliert);
+             // console.log("stepskaliert: "+ stepskaliert);
         
                 svg.selectAll("rect"+name)
                     .data(daten)
@@ -445,7 +420,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 .range([25, w-25]);
                 let xAxisGenerator = d3.axisBottom(x)
                 //let tick = top-bot;
-                console.log("Typ von bot: " + tick)
+                // console.log("Typ von bot: " + tick)
                 if(tick>10){
                     tick=10;
                 }
@@ -487,7 +462,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                     .attr("color","red")
                 }
             }else{
-                  console.log("a gefunden");
+                  // console.log("a gefunden");
                     //Wenn a direkt eingegeben wird, kasten bei a zeichnen und fertig.
                     svg.selectAll("rect_a")
                         .data([1,2])
@@ -558,11 +533,11 @@ const Zahlenstrahl: React.FunctionComponent = (name) => {
   const data =[name];
   var content ;
         content = data.pop();
- console.log( content.name);
+ // console.log( content.name);
 //   Cookiename = content.name;
   const svg = React.useRef<SVGSVGElement>(null);
   processDataTable(content.name);
- console.log("Call drawSvg für " + content.name);
+ // console.log("Call drawSvg für " + content.name);
   React.useEffect(() => {
     drawSvg(svg,content.name);
   }, [svg]);
@@ -571,7 +546,7 @@ const Zahlenstrahl: React.FunctionComponent = (name) => {
 // var nom = 'abc';
 // window[nom] = 'something';
 // alert(abc);
-console.log(svg);
+// console.log(svg);
 
   return (
     <div >

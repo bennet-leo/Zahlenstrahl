@@ -17,12 +17,9 @@ export default function Home() {
         <title>Zahlenstrahl</title>
       </Head>
       <main className={styles.main}>
-        <div>
-          <div>
-            {/* <div id={Zahlenstrahl_1_name}></div> */}
-            <div><Zahlenstrahl name={Zahlenstrahl_1_name} /></div>
-            <div>Definitionsbereich von a</div>
-          </div>
+        
+          <div><Zahlenstrahl name={Zahlenstrahl_1_name} /></div>
+          <div>Definitionsbereich von a</div>
           <div>
             <label>a </label>
             <select id = {"operator"+Zahlenstrahl_1_name}>
@@ -41,11 +38,9 @@ export default function Home() {
             <button onClick={() => showData(Zahlenstrahl_1_name)} >Daten Anzeigen</button>
             <button onClick={() => Vis(Zahlenstrahl_1_name)} >Visualiserung Anzeigen</button>     
           </div>
-      </div>
       
-      <div>
+      {/* <div>
           <div>
-            {/* <div id={Zahlenstrahl_2_name}></div> */}
             <div><Zahlenstrahl name={Zahlenstrahl_2_name} /></div>
             <div>Definitionsbereich von a</div>
           </div>
@@ -67,7 +62,9 @@ export default function Home() {
             <button onClick={() => showData(Zahlenstrahl_2_name)} >Daten Anzeigen</button>
             <button onClick={() => Vis(Zahlenstrahl_2_name)} >Visualiserung Anzeigen</button>     
           </div>
-      </div>
+      </div> */}
+
+      
     {/* <div><Zlstrl name='0003'/></div> */}
       </main>
     </div>   

@@ -17,16 +17,17 @@ import cookieCutter from 'cookie-cutter';
 // let gaps ;//
 // gaps= [] ;
 
-let daten_gb ={
-    a :'undefined',
-    topBorder :'undefined',
-    bottomBorder :'undefined',
-    aGefunden : false,
-    includingBottom : false,
-    includingTop : false,
-    includingGaps : false,
-    gaps : []
-}
+// let daten_gb ={
+//     a :'undefined',
+//     topBorder :'undefined',
+//     bottomBorder :'undefined',
+//     aGefunden : false,
+//     includingBottom : false,
+//     includingTop : false,
+//     includingGaps : false,
+//     nichtDefiniert : false,
+//     gaps : []
+// }
 
 async function processDataTable(Cookiename){
 
@@ -39,6 +40,7 @@ async function processDataTable(Cookiename){
         includingBottom : false,
         includingTop : false,
         includingGaps : false,
+        nichtDefiniert : false,
         gaps : []
     }
 
@@ -125,15 +127,15 @@ async function processDataTable(Cookiename){
                 break;
             case '=':
               console.log("A gefunden")
-            //   daten.a=value;
+              daten.a=value;
             //   daten.aGefunden=true;
             if(typeof daten.topBorder!=='number' || daten.topBorder>value){
-                daten.topBorder = value;
-                daten.includingTop = true;
+                daten.topBorder = value + 1;
+                daten.includingTop = false;
             }
             if(typeof daten.bottomBorder!=='number' || daten.bottomBorder<value){
-                daten.bottomBorder = value;
-                daten.includingBottom = true;
+                daten.bottomBorder = value - 1;
+                daten.includingBottom = false;
             }
                 break;
             case '!=':
@@ -147,6 +149,9 @@ async function processDataTable(Cookiename){
         }
     }
     daten.gaps=gaps;
+    if(daten.bottomBorder>daten.topBorder){
+        daten.nichtDefiniert = true;
+    }
 
 console.log("Top Border: " + daten.topBorder + " including: " + daten.includingTop )
 console.log("Bot Border: " + daten.bottomBorder + " including: " + daten.includingBottom)
@@ -166,6 +171,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 includingBottom : false,
                 includingTop : false,
                 includingGaps : false,
+                nichtDefiniert : false,
                 gaps : []
             } 
 
@@ -181,6 +187,7 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
             let includingBottom  = datenStruct.includingBottom;
             let includingTop  = datenStruct.includingTop;
             let includingGaps  = datenStruct.includingGaps;
+            let nichtDefiniert = datenStruct.nichtDefiniert;
             let gaps ;//
             gaps= [] ;
             gaps = datenStruct.gaps;
@@ -315,18 +322,14 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 länge=daten.length-1;
             }
         
-            console.log("daten: "+ daten);
-            console.log("länge: "+ länge);
             for (let index = 0; index < länge; index++) {    
                 
-                data2.push(daten.pop())
+                data2.push(daten.pop());
+                let intervalllänge = daten[daten.length-1] - data2[0];
                 let differenzStartEnde = Math.abs(top-bot);
+                //unteres Ende des Intervalls
                 let startskaliert= 25+(data2[0]-bot)*((w/(differenzStartEnde)));
-                //was war der Gedankengang
-                if (obenoffen) {
-                    console.log("Frisch berechnet startskaliert: "+ startskaliert);
-                    //startskaliert /=2;
-                } 
+                //oberes Ende des Intervalls
                 let endeskaliert = (daten[daten.length-1]-bot)*((w/(differenzStartEnde)));
                 if (daten.length===1) {
                     endeskaliert -=25;
@@ -342,8 +345,20 @@ console.log("gaps: " + daten.gaps + " including: " + daten.includingGaps)
                 }
         
         
-                console.log("Index = " + index);
-                console.log("länge = " + länge);
+                console.log("daten: "+ daten);
+                console.log("länge: "+ länge);
+                console.log("intervalllänge: "+ intervalllänge);
+                //wenn nur ein Wert im Array vorhanden ist
+                // if(intervalllänge===0 && !nichtDefiniert){
+                //     // startskaliert -= stepskaliert/3;
+                //     // endeskaliert += stepskaliert/3;
+                //     startskaliert = w/2-25;
+                //     endeskaliert = w/2-25;
+                //     bot = a-1;
+                //     top = a+1
+                //     console.log("Daten manipuliert! ");
+                // }
+                // console.log("Index = " + index);
                 
                     if(index ===länge-1 && !includingTop &&!obenoffen){
                         endeskaliert -= stepskaliert/2;

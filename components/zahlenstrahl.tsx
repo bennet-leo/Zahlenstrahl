@@ -134,7 +134,7 @@ async function processDataTable(Cookiename){
                 daten.includingTop = false;
             }
             if(typeof daten.bottomBorder!=='number' || daten.bottomBorder<value){
-                daten.bottomBorder = value - 1;
+                daten.bottomBorder  = (value - 1) as unknown as string;
                 daten.includingBottom = false;
             }
                 break;

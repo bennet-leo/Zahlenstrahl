@@ -16,6 +16,7 @@ npm run dev
 yarn dev
 ```
 
-[http://localhost:3000](http://localhost:3000) mit dem Browser aufrufen, um das Interface der App zu sehen..
+[http://localhost:3000](http://localhost:3000) mit dem Browser aufrufen, um das Interface der App zu sehen.
+Für die Funktion der Applikation ist es wichtig, dass im Browser Cookies gespeichert und gelesen werden können.
 
 

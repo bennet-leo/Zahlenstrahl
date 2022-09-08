@@ -10,7 +10,6 @@ async function addToCookie (operator, value, Cookiename){
             if(data!=='{}'){
                 obj = JSON.parse(data); 
                 obj.table.push({op: operator, val : value});
-                // console.log("read data from cookie and added new entry");
             }else{
                 obj = {
                     table: [{op: operator, val:value}]
@@ -24,7 +23,6 @@ async function addToCookie (operator, value, Cookiename){
     let json = JSON.stringify(obj) ;
 
      cookieCutter.set(Cookiename, json)
-    //  printCookieContent("Daten hinzugefügt")
 }
 
 async function deleteCookie(name){
@@ -49,17 +47,6 @@ function dataHandler(operator,value,name) {
 }
 
 export default dataHandler;
-
-// export async function dataToJson2(operator, value, CookieName) {
-//     let operator = document.getElementById("operator").value;
-//     let value = document.getElementById("value").value;
-//      if( !isNaN(value) && value.length !== 0 ){ //
-//        let text = dataHandler(operator, value,CookieName);
-//     }else{
-//      alert("Bitte eine Zahl eingeben.")
-//      clear();
-//      }
-//     }
 
 
 async function print(value){

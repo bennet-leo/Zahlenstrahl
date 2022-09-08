@@ -8,7 +8,6 @@ import Zlstrl from '../components/zahlenstrahl_module'
 
 const Zahlenstrahl_1_name = "0001";
 const Zahlenstrahl_2_name = "0002";
-// var z1 = <Zahlenstrahl name={Zahlenstrahl_1_name} id='0' />;
 export default function Home() {
 
   return (
@@ -17,7 +16,6 @@ export default function Home() {
         <title>Zahlenstrahl</title>
       </Head>
       <main className={styles.main}>
-        <div>
           <div><Zahlenstrahl name={Zahlenstrahl_1_name} /></div>
           <div>Definitionsbereich von a</div>
           <div>
@@ -33,17 +31,15 @@ export default function Home() {
             <input type="text" id={"value"+Zahlenstrahl_1_name}onClick={() => clear(Zahlenstrahl_1_name)} />
           </div>
           <div>
-            <button onClick={() => dataToJson(Zahlenstrahl_1_name)} >hinzufügen</button>
-            <button onClick={() => reset(Zahlenstrahl_1_name)} >reset</button>
-            <button onClick={() => showData(Zahlenstrahl_1_name)} >Daten Anzeigen</button>
-            <button onClick={() => Vis(Zahlenstrahl_1_name)} >Visualiserung Anzeigen</button>     
+            <button onClick={() => dataToJson(Zahlenstrahl_1_name)} >Hinzufügen</button>
+            <button onClick={() => reset(Zahlenstrahl_1_name)} >Reset</button>
+            <button onClick={() => showData(Zahlenstrahl_1_name)} >Daten anzeigen</button>
+            <button onClick={() => Vis(Zahlenstrahl_1_name)} >Visualiserung anzeigen</button>     
           </div>
-          </div>
-      <div>
-          <div>
+
+
             <div><Zahlenstrahl name={Zahlenstrahl_2_name} /></div>
             <div>Definitionsbereich von a</div>
-          </div>
           <div>
             <label>a </label>
             <select id = {"operator"+Zahlenstrahl_2_name}>
@@ -62,13 +58,8 @@ export default function Home() {
             <button onClick={() => showData(Zahlenstrahl_2_name)} >Daten Anzeigen</button>
             <button onClick={() => Vis(Zahlenstrahl_2_name)} >Visualiserung Anzeigen</button>     
           </div>
-      </div>
-
-      
-    {/* <div><Zlstrl name='0003'/></div> */}
       </main>
     </div>   
-    
     
   )
 }
@@ -76,8 +67,6 @@ export default function Home() {
 
 function showData(Cookiname){
   var text = CookiePrinter(Cookiname);
-  // var elem = document.getElementById("cookie");
-  // elem.text = text;
 }
 
  function clear(name){

@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import dataHandler from '../components/dataHandler'
 import CookiePrinter from '../components/cookiePrinter'
 import Zahlenstrahl from '../components/zahlenstrahl.tsx'
+import {drawSvg} from '../components/zahlenstrahl.tsx'
 import { setCookieName } from '../components/zahlenstrahl.tsx'
 import Zlstrl from '../components/zahlenstrahl_module'
 
@@ -31,14 +32,12 @@ export default function Home() {
             <input type="text" id={"value"+Zahlenstrahl_1_name}onClick={() => clear(Zahlenstrahl_1_name)} />
           </div>
           <div>
-            <button onClick={() => dataToJson(Zahlenstrahl_1_name)} >Hinzufügen</button>
-            <button onClick={() => reset(Zahlenstrahl_1_name)} >Reset</button>
-            <button onClick={() => showData(Zahlenstrahl_1_name)} >Daten anzeigen</button>
-            <button onClick={() => Vis(Zahlenstrahl_1_name)} >Visualiserung anzeigen</button>     
+            <button onClick={() => dataToCookie(Zahlenstrahl_1_name)} >Hinzufügen</button>
+            <button onClick={() => CookiePrinter(Zahlenstrahl_1_name)} >Daten anzeigen</button>     
           </div>
 
 
-            <div><Zahlenstrahl name={Zahlenstrahl_2_name} /></div>
+            {/* <Zahlenstrahl name={Zahlenstrahl_2_name} />
             <div>Definitionsbereich von a</div>
           <div>
             <label>a </label>
@@ -53,11 +52,9 @@ export default function Home() {
             <input type="text" id={"value"+Zahlenstrahl_2_name}onClick={() => clear(Zahlenstrahl_2_name)} />
           </div>
           <div>
-            <button onClick={() => dataToJson(Zahlenstrahl_2_name)} >hinzufügen</button>
-            <button onClick={() => reset(Zahlenstrahl_2_name)} >reset</button>
-            <button onClick={() => showData(Zahlenstrahl_2_name)} >Daten Anzeigen</button>
-            <button onClick={() => Vis(Zahlenstrahl_2_name)} >Visualiserung Anzeigen</button>     
-          </div>
+            <button onClick={() => dataToCookie(Zahlenstrahl_2_name)} >hinzufügen</button>
+            <button onClick={() => CookiePrinter(Zahlenstrahl_2_name)} >Daten Anzeigen</button>   
+          </div> */}
       </main>
     </div>   
     
@@ -65,16 +62,12 @@ export default function Home() {
 }
 
 
-function showData(Cookiname){
-  var text = CookiePrinter(Cookiname);
-}
-
  function clear(name){
   const inputField = document.getElementById("value"+name);
   inputField.value = "";
  }
 
- async function dataToJson(CookieName) {
+ async function dataToCookie(CookieName) {
    let operator = document.getElementById("operator"+CookieName).value;
    let value = document.getElementById("value"+CookieName).value;
     if( !isNaN(value) && value.length !== 0 ){ //
@@ -83,11 +76,4 @@ function showData(Cookiname){
     alert("Bitte eine Zahl eingeben.")
     clear();
     }
- }
- function Vis(){
-  location.reload();
- }
- function reset(CookieName){
-   dataHandler('delete', 0, CookieName);
-   location.reload();
  }

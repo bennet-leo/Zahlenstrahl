@@ -1,25 +1,23 @@
 import * as React from 'react';
 import * as d3 from "d3";
 import cookieCutter from 'cookie-cutter';
+import dataHandler from './dataHandler';
+
 
 async function processDataTable(Cookiename){
 
+    //Hier werden die Werte, die aus dem Cookie gelesen werden, abgespeichert
+    const   processedInputValues = {};
 
-    let daten ={
-        a:'undefined',
-        topBorder :'undefined',
-        bottomBorder :'undefined',
-        aGefunden : false,
-        includingBottom : false,
-        includingTop : false,
-        includingGaps : false,
-        nichtDefiniert : false,
-        gaps : []
-    }
+    processedInputValues['topBorder']='undefined';
+    processedInputValues['bottomBorder']='undefined';
+    processedInputValues['includingBottom']=false;
+    processedInputValues['isIncludingTop']=false;
+    processedInputValues['includingGaps']=false;
+    processedInputValues['gaps']=[];
 
-    let gaps;
-    gaps= [] ;
     let data;
+    //Daten werden aus einem Cookie geladen
     var cookie = cookieCutter;
     data = cookie.get(Cookiename);
     //Wenn initial geladen wird, muss der Cookie erst gesetzt werden.
@@ -42,73 +40,77 @@ async function processDataTable(Cookiename){
     let localTable = dataTable;
     var length = localTable.table.length;
     let loopcount =0;
-    daten.topBorder = 'max';
-    daten.bottomBorder = 'min';
+    processedInputValues['topBorder'] = 'max';
+    processedInputValues['bottomBorder'] = 'min';
     //In bottomBorder muss der größte Wert eingetragen werden, der kleiner als a ist
     //In topBorder muss der kleinste Wert eingetragen werden, der größer als a ist
     for(let i = 0;i < length; i++){
         loopcount++;
-        var content ;
-        content = localTable.table.pop();
-        if(typeof content ==='undefined'){
+        var rawInputValues ;
+        rawInputValues = localTable.table.pop();
+        if(typeof rawInputValues ==='undefined'){
             alert("Can't load element from table!")
         }else{
             let value;
-            value = parseInt(content.val,10)
+            value = parseInt(rawInputValues.val,10)
             let rawData;
-            rawData = content.val;
-            switch (content.op) {
+            rawData = rawInputValues.val;
+            switch (rawInputValues.op) {
             case '<':
                 //Wenn in topBorder 'min' steht, oder der gegenwärtige Wert kleiner, 
                 //als der bisher größte eingetragene Wert ist wird der gegenwärtige Wert
                 //in topBorder notiert und die Inklusion abgeschaltet
-                if(typeof daten.topBorder!=='number' || daten.topBorder>value){
-                    daten.topBorder = value;
-                    daten.includingTop = false;
+                if(typeof processedInputValues['topBorder']!=='number' || processedInputValues['topBorder']>value){
+                    processedInputValues['topBorder'] = value;
+                    processedInputValues['isIncludingTop'] = false;
                 }
                 break;
             case '>':
                 //Wenn in Bottomborder 'min' steht, oder der gegenwärtige Wert größer, 
                 //als der bisher größte eingetragene Wert ist wird der gegenwärtige Wert
                 //in BottomBorder notiert und die Inklusion abgeschaltet
-                if(typeof daten.bottomBorder!=='number' || daten.bottomBorder<value){
-                    daten.bottomBorder = value;
-                    daten.includingBottom = false;
+                if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
+                    processedInputValues['bottomBorder'] = value;
+                    processedInputValues['includingBottom'] = false;
                 }
                 break;
             case '≥':
                 //Wenn in Bottomborder 'min' steht, oder der gegenwärtige Wert größer, 
                 //als der bisher größte eingetragene Wert ist wird der gegenwärtige Wert
                 //in BottomBorder notiert und die Inklusion eingeschaltet, da a auch den Wert annehmen kann
-                if(typeof daten.bottomBorder!=='number' || daten.bottomBorder<value){
-                    daten.bottomBorder = value;
-                    daten.includingBottom = true;
+                if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
+                    processedInputValues['bottomBorder'] = value;
+                    processedInputValues['includingBottom'] = true;
                 }
                 break;
             case '≤':
                 //Wenn in topBorder 'min' steht, oder der gegenwärtige Wert kleiner, 
                 //als der bisher größte eingetragene Wert ist wird der gegenwärtige Wert
                 //in topBorder notiert und die Inklusion eingeschaltet, da a auch den Wert annehmen kann.
-                if(typeof daten.topBorder!=='number' || daten.topBorder>value){
-                    daten.topBorder = value;
-                    daten.includingTop = true;
+                if(typeof processedInputValues['topBorder']!=='number' || processedInputValues['topBorder']>value){
+                    processedInputValues['topBorder'] = value;
+                    processedInputValues['isIncludingTop'] = true;
                 }
                 
                 break;
             case '=':
-              daten.a=value;
-            if(typeof daten.topBorder!=='number' || daten.topBorder>value){
-                daten.topBorder = value + 1;
-                daten.includingTop = false;
+                //Wenn a direkt eingegeben wird, wird versucht ein Intervall mit den Grenzen a+1 und a-1 anzulegen
+                //Da in der Visualisierung für kleinergleich und größergleich nur ein strich dargestellt werden würde.
+                processedInputValues['a'];
+            if(typeof processedInputValues['topBorder']!=='number' || processedInputValues['topBorder']>value){
+                processedInputValues['topBorder'] = value + 1;
+                processedInputValues['isIncludingTop'] = false;
             }
-            if(typeof daten.bottomBorder!=='number' || daten.bottomBorder<value){
-                daten.bottomBorder  = (value - 1) as unknown as string;
-                daten.includingBottom = false;
+            if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
+                processedInputValues['bottomBorder']  = (value - 1) as unknown as string;
+                processedInputValues['includingBottom'] = false;
             }
                 break;
             case '!=':
-                gaps.push(value)
-                daten.includingGaps=true;
+                //Für werte, die aus dem Gültigkeitsbereich ausgeschlossen werden sollen, 
+                //Wird eine Liste angelegt, in der sie vermerkt werden
+                processedInputValues['gaps'].push(value)
+                processedInputValues['includingGaps']=true;
                 break;
         
             default:
@@ -116,65 +118,63 @@ async function processDataTable(Cookiename){
             }
         }
     }
-    daten.gaps=gaps;
-    if(daten.bottomBorder>daten.topBorder){
-        daten.nichtDefiniert = true;
+    if(processedInputValues['bottomBorder']>processedInputValues['topBorder']){
+        processedInputValues['nichtDefiniert'] = true;
     }
-  return daten;
+    // console.log(processedInputValues)
+  return processedInputValues;
 }
 
 async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
 
-            let datenStruct;
-            datenStruct ={
-                a:0,
+            let processedInputValues;
+            processedInputValues ={
                 topBorder :0,
                 bottomBorder :0,
-                aGefunden : false,
                 includingBottom : false,
-                includingTop : false,
+                isIncludingTop : false,
                 includingGaps : false,
-                nichtDefiniert : false,
                 gaps : []
             } 
+            //Hier werden die Werte für die Visualisierung abgespeichert
+            let visualisationData;
+            visualisationData = {
+                visualTopBorder :undefined,
+                visualBottomBorder :undefined,
+                blockMap : new Map()
+            };
 
-            let tabledata = processDataTable(name);
-            datenStruct = await tabledata.then();
+            const   inputData = processDataTable(name);
+            processedInputValues = await inputData.then();
 
-            let a = datenStruct.a;
-            let topBorder  = datenStruct.topBorder;
-            let bottomBorder = datenStruct.bottomBorder ;
-            let aGefunden  = datenStruct.aGefunden;
-            let includingBottom  = datenStruct.includingBottom;
-            let includingTop  = datenStruct.includingTop;
-            let includingGaps  = datenStruct.includingGaps;
-            let nichtDefiniert = datenStruct.nichtDefiniert;
-            let gaps ;//
-            gaps= [] ;
-            gaps = datenStruct.gaps;
+            // let includingBottom  = processedInputValues.includingBottom;
+            let isIncludingTop  = processedInputValues.isIncludingTop;
+            let includingGaps  = processedInputValues.includingGaps;
+            let gaps = processedInputValues.gaps;
 
 
-            let Cookiename = name;
             const h = 60;
-            const w = 600;
+            const w = 300;
             const green =       '#4fbd53';
             const dark_green =  '#128006';
             const gray =        '#b5b5b5';
             const achsenHöhe = h-20;
             const svg = d3.select(svgRef.current);
+            const offsetLeft = 25;
+            const offsetRight = 25;
+
             let data;
             data = [];
-            let bot ;
-            let top ;
-            if(typeof topBorder === 'number'){
-                data.push(topBorder);
-                top=topBorder;
+
+            if(typeof processedInputValues.topBorder === 'number'){
+                data.push(processedInputValues.topBorder);
+                visualisationData.visualTopBorder=processedInputValues.topBorder;
             }
-            if(typeof bottomBorder === 'number'){
-                data.push(bottomBorder);
-                bot=bottomBorder;
+            if(typeof processedInputValues.bottomBorder === 'number'){
+                data.push(processedInputValues.bottomBorder);
+                visualisationData.visualBottomBorder=processedInputValues.bottomBorder;
             }
-            const lineDistance =top-bot;
+
           svg
             .attr("width", w)
             .attr("height", h)
@@ -185,46 +185,51 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
             .style("background-color",gray)
             .text('no');
         
-        let obenoffen = true;
-        let untenoffen = true;
-        let pushedTop = false;
-        let pushedBot = false;
+        //Bei oben oder unten unbegrenzten Intervallen muss eine künstliche Grenze
+        //vergeben werden. um das Anzeigen zu ermöglichen
+        //dazu wird der oberste oder unterste letzte darzustellende Parameter ausgewählt und 
+        //im Abstand von 5 dazu die künstliche Grenze gesetzt.
+        //Ist keine Grenze oben UND unten vorhanden. muss die Vergabe der künstlichen Grenze
+        //doppelt durchgeführt werden, damit oben und unten eine künstliche Grenze eingefügt wird
+        let isTopInfinite = true, isBottomInfinite = true;
+
+        let isAartificialTopBorderSet = false, isArtificialBottomBorderSet = false;
         for (let index = 0; index < 2; index++) {
         
-            if (!isNaN(bottomBorder)) {
-                untenoffen = false;
+            if (!isNaN(processedInputValues.bottomBorder)) {
+                isBottomInfinite = false;
             }else{
-                if (!obenoffen&&!pushedBot) {
+                if (!isTopInfinite&&!isArtificialBottomBorderSet) {
                     if (includingGaps) {
                         const min = Math.min(...gaps);
-                        bot=min-5; 
+                        visualisationData.visualBottomBorder=min-5; 
                     }else{
-                        bot=topBorder-5; 
+                        visualisationData.visualBottomBorder=processedInputValues.topBorder-5; 
                     } 
-                    data.push(bot);   
-                    pushedBot=true;
+                    data.push(visualisationData.visualBottomBorder);   
+                    isArtificialBottomBorderSet=true;
                 }
             }
-            if (!isNaN(topBorder)) {
-                obenoffen = false;
+            if (!isNaN(processedInputValues.topBorder)) {
+                isTopInfinite = false;
             }else{
-                if (!untenoffen&&!pushedTop) {
+                if (!isBottomInfinite&&!isAartificialTopBorderSet) {
                     if (includingGaps) {
                         const max = Math.max(...gaps);
-                        top=max+5;
+                        visualisationData.visualTopBorder=max+5;
                     }else{
-                        top=bottomBorder+5;
+                        visualisationData.visualTopBorder=processedInputValues.bottomBorder+5;
                     } 
-                    data.push(top); 
-                    pushedTop=true;
+                    data.push(visualisationData.visualTopBorder); 
+                    isAartificialTopBorderSet=true;
                 }
             }
             
         }
-        //Inhalte der Grafik werden erst generiert, wenn top und bot Zahlenwerte enthalten
-            if(!isNaN(bot) && !isNaN(top)){
-            let data2;
-            data2 = [];
+        //Inhalte der Grafik werden erst generiert, wenn mindestens ein Wert vergeben wurde
+        //Ansonsten wird nur der Hintergrund angezeigt
+            console.log("processedInputValues.topBorder" + visualisationData.visualTopBorder)
+            if(!isNaN(visualisationData.visualBottomBorder) && !isNaN(visualisationData.visualTopBorder)){
         
             data.sort(function(a, b) {
                 return a + b;
@@ -233,75 +238,136 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                 return a - b;
             });
             let gapsLänge = gaps.length;
-            let daten_false_order;
-            daten_false_order = [];
-            //Lücken müssen ins array mit eingefügt werden
-            daten_false_order.push(data.pop());
-            for (let index = 0; index < gapsLänge; index++) {
-                if(gaps[index]>bot &&gaps[index]<top){
-                    daten_false_order.push(gaps[index]);
-                    daten_false_order.push(gaps[index]);
-                }
-            }
-            daten_false_order.push(data.pop());
-            let länge;
-        
+
             let daten;
             daten = [];
-            let datenlänge = daten_false_order.length;
-            for (let index = 0; index < datenlänge; index++) {
-                daten.push(daten_false_order.pop());
-                
+            //Lücken müssen ins array mit eingefügt werden
+            daten.push(data.pop());
+            for (let index = 0; index < gapsLänge; index++) {
+                if(gaps[index]>visualisationData.visualBottomBorder &&gaps[index]<visualisationData.visualTopBorder){
+                    //Werte für Lücken müssen doppelt eingefügt werden,
+                    //da sie die Grenzen von zwei Blöcken darstellen
+                    daten.push(gaps[index]);
+                    daten.push(gaps[index]);
+                }
             }
+            daten.push(data.pop());
+            let länge;
+
             daten.sort(function(a, b){return b-a});
         
+            //Lieber im Schleifendurchlauf immer 2 Schritte machen
             if(includingGaps){
                 länge = daten.length/2;
             }else{
                 länge=daten.length-1;
             }
         
+            let data2;
+            data2 = [];
+
+            // const 
+            let mapIndex = 0;
+            for (let index = 0; index < daten.length; index++) {
+                let blockBoders = {rightBorder : daten[index],leftBorder : daten[index+1]};
+                visualisationData.blockMap.set(mapIndex , blockBoders);
+                mapIndex++, index++;                
+            }
+            // console.log("Blockmap size "+visualisationData.blockMap.size);
+
+            let blocks,blocks_w_params;
+            blocks=[],blocks_w_params=[];
+            for (let index = 0; index < visualisationData.blockMap.size; index++) {
+                //Aufruf der Visualisierungs-Parameter-Berechnungsfunktionen
+                // visualizationParameters ={
+                //     scaledBlockStart :0,
+                //     scaledBlockEnd :0
+                // };
+                // let visualizationParametersSpecialCases;
+                // visualizationParametersSpecialCases ={
+                //     scaledBlockStart :0,
+                //     scaledBlockEnd :0
+                // };
+                // console.log("left Border raw: "+ visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).leftBorder);
+                // console.log("right Border raw: "+ visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).rightBorder);
+                let visualizationParameters;
+                visualizationParameters = calculateBlockParameters(
+                    visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).leftBorder,
+                    visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).rightBorder,
+                    w,
+                    processedInputValues.bottomBorder,processedInputValues.topBorder,
+                    offsetLeft,
+                    offsetRight
+                    );
+                //eventuell Offset mit einbeziehen
+                let visualizationParametersSpecialCases = checkSpecialCases(
+                    visualizationParameters.intervalStart,
+                    visualizationParameters.intervalEnd,
+                    visualizationParameters.stepWidth,
+                    isBottomInfinite,
+                    isTopInfinite,
+                    index,
+                    visualisationData.blockMap.size,
+                    isIncludingTop,
+                    processedInputValues.includingBottom,
+                    processedInputValues.includingGaps,
+                    w);
+
+
+                // console.log("left border scaled: "+ visualizationParameters.intervalStart);
+                // console.log("right border scaled: "+ visualizationParameters.intervalEnd);
+                blocks.push(visualizationParameters);
+                blocks_w_params.push(visualizationParametersSpecialCases);
+            }
+
+            console.log(blocks);
+            console.log(blocks_w_params);
+
+
             for (let index = 0; index < länge; index++) {    
                 
                 data2.push(daten.pop());
-                let intervalllänge = daten[daten.length-1] - data2[0];
-                let differenzStartEnde = Math.abs(top-bot);
+
+                let differenzStartEnde = Math.abs(visualisationData.visualTopBorder-visualisationData.visualBottomBorder);
+                let wgraph = w-50;
                 //unteres Ende des Intervalls
-                let startskaliert= 25+(data2[0]-bot)*((w/(differenzStartEnde)));
+                let startskaliert= 25+(data2[0]-visualisationData.visualBottomBorder)*((wgraph/(differenzStartEnde)));
                 //oberes Ende des Intervalls
-                let endeskaliert = (daten[daten.length-1]-bot)*((w/(differenzStartEnde)));
-                if (daten.length===1) {
-                    endeskaliert -=25;
+                let endeskaliert = 25+(daten[daten.length-1]-visualisationData.visualBottomBorder)*((wgraph/(differenzStartEnde)));
+
+                let stepSize = ((wgraph)/(differenzStartEnde));
+                //Schrittgröße zur Ermittlung der oberen und unteren Begrenzung sollte 
+                //zur Übersichtlichkeit nie weniger als 3% der Gesamtbreite sein
+                if(stepSize<wgraph*(3/100)){
+                    stepSize=wgraph*(3/100);
                 }
-                let differenzStartEndelokal = Math.abs(endeskaliert - startskaliert);
-                let stepskaliert = ((differenzStartEndelokal)/(differenzStartEnde));
-        
-                if (obenoffen&& (!includingGaps||index!=0)) {
+                // if (obenoffen&& (!includingGaps||index!=0)) {
+                    if (isTopInfinite&& (index===länge-1)) {
                     endeskaliert = w;
                 }
-                if (untenoffen && (!includingGaps||index!=länge-1)) {
+                if (isBottomInfinite && (index===0)) {
                     startskaliert = 0;
                 }
                 
-                if(index ===länge-1 && !includingTop &&!obenoffen){
-                    endeskaliert -= stepskaliert/2;
+                if(index ===länge-1 && !isIncludingTop &&!isTopInfinite){
+                    endeskaliert -= (stepSize/2);
                 }
-                if(index===0 && !includingBottom&&!untenoffen){
-                    startskaliert += stepskaliert/2;
+                if(index===0 && !processedInputValues.includingBottom && !isBottomInfinite){
+                    startskaliert += stepSize/2;
                 }
+
                 //Wenn es eine Lücke gibt
                 if (index !==länge-1 ) {
-                    endeskaliert -= stepskaliert/2;
+                    endeskaliert -= stepSize/2;
                 }            
-                if(index !==länge-1 && index!==0&&!obenoffen&&!untenoffen){
-                    endeskaliert -= stepskaliert/2;
-                    startskaliert += stepskaliert/2;
+                if( index!==0){
+                    startskaliert += stepSize/2;
                 }
         
         
                 let breiteSkaliert = Math.abs(endeskaliert - startskaliert)
         
-                svg.selectAll("rect"+name)
+                svg.selectAll("Bar")
                     .data(daten)
                     .enter()
                     .append("rect")
@@ -311,14 +377,16 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                     .attr("height", 48)
                     .attr("opacity", 50)
                     .attr("fill", green);
-                    if(!untenoffen||!(!includingGaps||index!=länge-1)){
+                    if(!isBottomInfinite||!(!includingGaps||index===0)){
+                        //Linke Grenze des Balken wird mit einer dunkelgrünen Klammer markiert
                     svg.append('path')
                         .attr('d', d3.line()([[startskaliert+10,2], [startskaliert, 2], [startskaliert, 50], [startskaliert+10, 50]]))
                         .attr('stroke', dark_green)
                         .attr('stroke-width', 4)
                         .attr('fill', 'none');
                     }
-                    if(!obenoffen||!(!includingGaps||index!=0)){
+                    //Rechte Grenze des Balken wird mit einer dunkelgrünen Klammer markiert
+                    if(!isTopInfinite||!(!includingGaps||index===länge-1)){
                         svg.append('path')
                         .attr('d', d3.line()([[endeskaliert-10,2], [endeskaliert, 2], [endeskaliert, 50], [endeskaliert-10, 50]]))
                         .attr('stroke', dark_green)
@@ -331,31 +399,31 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                 data2.pop();
             }
         
-                let tick = top-bot;
+                let tick = visualisationData.visualTopBorder-visualisationData.visualBottomBorder;
                 var x = d3.scaleLinear()
-                .domain([bot, top])
+                .domain([visualisationData.visualBottomBorder, visualisationData.visualTopBorder])
                 .range([25, w-25]);
                 let xAxisGenerator = d3.axisBottom(x)
                 if(tick>10){
                     tick=10;
                 }
-                if(obenoffen){
+                if(isTopInfinite){
                     if (includingGaps) {
                         
                     }else{
                         tick=2;
-                        let tickLabels = [bot,'∞'];
+                        let tickLabels = [visualisationData.visualBottomBorder,'∞'];
                         xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
-                        xAxisGenerator.tickValues([bot,top]);
+                        xAxisGenerator.tickValues([visualisationData.visualBottomBorder,visualisationData.visualTopBorder]);
                     }
-                }else if (untenoffen) {
+                }else if (isBottomInfinite) {
                     if (includingGaps) {
 
                     }else{
                         tick=3;
-                        let tickLabels = ['-∞',top];
+                        let tickLabels = ['-∞',visualisationData.visualTopBorder];
                         xAxisGenerator.tickFormat((d,i) => tickLabels[i]);
-                        xAxisGenerator.tickValues([bot,top]);
+                        xAxisGenerator.tickValues([visualisationData.visualBottomBorder,visualisationData.visualTopBorder]);
         
                     }
                     
@@ -392,19 +460,96 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                     .attr('fill', 'none');
                 }
 
+/*
+Funktion zur Berechnung der generellen Start- und Endkoordinate eines Blocks
+*/
+function calculateBlockParameters(startValue,endValue,drawingWidth,visStartValue,visEndValue,offsetLeft,offsetRight){
+    const blockParameters={};
+    blockParameters['intervalLength'] = endValue - startValue;
+    //Anzahl der Werte, die in der Visualisierung abgebildet werden
+    let totalSteps = visEndValue - visStartValue;
+    //Breite der Fläche innerhalb derer der Zahlenstrahl gezeichnet werden soll
+    let graphWidth = drawingWidth - (offsetLeft + offsetRight);
+    blockParameters['graphWidth']=graphWidth;
+    //anteilige Breite eines Schrittes an der Gesamtbreite
+    let stepWidth = graphWidth/totalSteps;
+    //Schrittgröße zur Ermittlung der oberen und unteren Begrenzung sollte 
+    //zur Übersichtlichkeit nie weniger als 3% der Gesamtbreite sein
+    if(stepWidth<graphWidth*(3/100)){
+        stepWidth=graphWidth*(3/100);
+    }
+    blockParameters['stepWidth']=stepWidth;
+                
+    //Berechnung der Startposition des Blocks in der Grafischen Zeichenfläche
+    blockParameters['intervalStart'] = offsetLeft+(startValue-visStartValue)*(stepWidth);
+    blockParameters['intervalEnd'] = offsetLeft+(endValue-visStartValue)*(stepWidth);
+
+    return blockParameters;
+}
+
+function checkSpecialCases(startValue,endValue,setpWidth,isBottomInfinite,isTopInfinite,index,numberOfValues,isIncludingTopValue,isIncludingBottomValue,isIncludingGaps,drawingWidth){
+    const blockParameters = {};
+    let isLastIndex = false;
+    if (index === numberOfValues-1) {
+        isLastIndex = true;
+    }
+    let isFirstIndex = false;
+    if (index === 0) {
+        isFirstIndex = true;
+    }
+    //Für den Fall, dass es sich um den letzten Block handelt 
+    //und dieser nicht begrenzt ist, wird die Intervallgrenze auf den rechten Rand der Grafik gelegt.
+    if(isTopInfinite && isLastIndex){
+        blockParameters['intervalEnd']=drawingWidth;
+    }
+    //Für den Fall, dass es sich um den ersten Block handelt 
+    //und dieser nicht begrenzt ist, wird die Intervallgrenze auf den linken Rand der Grafik gelegt.
+    if (isBottomInfinite && isFirstIndex) {
+        blockParameters['intervalStart']=0;
+    }
+    //Wenn es der letzte Block ist und dieser oben begrenzt ist, aber der Wert nicht mit in den Wertebereich 
+    //Eingeschlossen wird, wird die Grenze einen halben Schritt nach links verschoben
+    if (!isTopInfinite && isLastIndex && !isIncludingTopValue) {
+        blockParameters['intervalEnd']=endValue-setpWidth/2;
+    }
+    //Wenn es der erste Block ist, dieser unten begrenzt ist, aber der Wert nicht in den Wertebereich
+    //Eingeschlossen wird, wird die Grenze um einen halben Schritt nach rechts verschoben
+    if (!isBottomInfinite && isFirstIndex && !isIncludingBottomValue) {
+        blockParameters['intervalStart']=startValue+setpWidth/2;
+    }
+    //für den Fall, dass es eine Lücke im Wertebereich gibt, werden die Start-Koordinaten aller Blöcke, die nicht 
+    //der erste Block sind, einen halben Schritt nach rechts verschoben
+    if (!isFirstIndex) {
+        blockParameters['intervalStart']=startValue+setpWidth/2;
+    }
+    //Für den Fall, dass es eine Lücke im Wertebereich gibt, werden die End-Koordinaten aller Blöcke, die nicht 
+    //der letzte Block sind, einen halben Schitt nach links verschoben
+    if (!isLastIndex) {
+        blockParameters['intervalEnd']=endValue-setpWidth/2;
+    }
+
+    return blockParameters;
+}
+function reset(CookieName){
+  dataHandler('delete', 0, CookieName);
+  location.reload();
+}
 
 const Zahlenstrahl: React.FunctionComponent = (name) => {
   const data =[name];
-  var content ;
-        content = data.pop();
+  var rawInputValues ;
+        rawInputValues = data.pop();
   const svg = React.useRef<SVGSVGElement>(null);
   React.useEffect(() => {
-    drawSvg(svg,content.name);
   }, [svg]);
+  drawSvg(svg,rawInputValues.name);
   return (
     <div >
-        <div>{content.name}</div>
-      <svg ref={svg} id={content.name} />
+        <div>{rawInputValues.name}</div>
+      <svg ref={svg} id={rawInputValues.name} />
+      <br/>
+      <button onClick={() => drawSvg(svg,rawInputValues.name)} >Visualisierung Anzeigen</button>
+      <button onClick={() => reset(rawInputValues.name)} >Reset</button>
     </div>
   );
 };

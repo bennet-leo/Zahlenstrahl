@@ -11,9 +11,9 @@ async function processDataTable(Cookiename){
 
     processedInputValues['topBorder']='undefined';
     processedInputValues['bottomBorder']='undefined';
-    processedInputValues['includingBottom']=false;
+    processedInputValues['isIncludingBottom']=false;
     processedInputValues['isIncludingTop']=false;
-    processedInputValues['includingGaps']=false;
+    processedInputValues['isIncludingGaps']=false;
     processedInputValues['gaps']=[];
 
     let data;
@@ -71,7 +71,7 @@ async function processDataTable(Cookiename){
                 //in BottomBorder notiert und die Inklusion abgeschaltet
                 if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
                     processedInputValues['bottomBorder'] = value;
-                    processedInputValues['includingBottom'] = false;
+                    processedInputValues['isIncludingBottom'] = false;
                 }
                 break;
             case '≥':
@@ -80,7 +80,7 @@ async function processDataTable(Cookiename){
                 //in BottomBorder notiert und die Inklusion eingeschaltet, da a auch den Wert annehmen kann
                 if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
                     processedInputValues['bottomBorder'] = value;
-                    processedInputValues['includingBottom'] = true;
+                    processedInputValues['isIncludingBottom'] = true;
                 }
                 break;
             case '≤':
@@ -103,14 +103,14 @@ async function processDataTable(Cookiename){
             }
             if(typeof processedInputValues['bottomBorder']!=='number' || processedInputValues['bottomBorder']<value){
                 processedInputValues['bottomBorder']  = (value - 1) as unknown as string;
-                processedInputValues['includingBottom'] = false;
+                processedInputValues['isIncludingBottom'] = false;
             }
                 break;
             case '!=':
                 //Für werte, die aus dem Gültigkeitsbereich ausgeschlossen werden sollen, 
                 //Wird eine Liste angelegt, in der sie vermerkt werden
                 processedInputValues['gaps'].push(value)
-                processedInputValues['includingGaps']=true;
+                processedInputValues['isIncludingGaps']=true;
                 break;
         
             default:
@@ -131,9 +131,9 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
             processedInputValues ={
                 topBorder :0,
                 bottomBorder :0,
-                includingBottom : false,
+                isIncludingBottom : false,
                 isIncludingTop : false,
-                includingGaps : false,
+                isIncludingGaps : false,
                 gaps : []
             } 
             //Hier werden die Werte für die Visualisierung abgespeichert
@@ -147,9 +147,9 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
             const   inputData = processDataTable(name);
             processedInputValues = await inputData.then();
 
-            // let includingBottom  = processedInputValues.includingBottom;
-            let isIncludingTop  = processedInputValues.isIncludingTop;
-            let includingGaps  = processedInputValues.includingGaps;
+            // let isIncludingBottom  = processedInputValues.isIncludingBottom;
+            // let isIncludingTop  = processedInputValues.isIncludingTop;
+            let isIncludingGaps  = processedInputValues.isIncludingGaps;
             let gaps = processedInputValues.gaps;
 
 
@@ -200,7 +200,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                 isBottomInfinite = false;
             }else{
                 if (!isTopInfinite&&!isArtificialBottomBorderSet) {
-                    if (includingGaps) {
+                    if (isIncludingGaps) {
                         const min = Math.min(...gaps);
                         visualisationData.visualBottomBorder=min-5; 
                     }else{
@@ -214,7 +214,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                 isTopInfinite = false;
             }else{
                 if (!isBottomInfinite&&!isAartificialTopBorderSet) {
-                    if (includingGaps) {
+                    if (isIncludingGaps) {
                         const max = Math.max(...gaps);
                         visualisationData.visualTopBorder=max+5;
                     }else{
@@ -228,7 +228,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
         }
         //Inhalte der Grafik werden erst generiert, wenn mindestens ein Wert vergeben wurde
         //Ansonsten wird nur der Hintergrund angezeigt
-            console.log("processedInputValues.topBorder" + visualisationData.visualTopBorder)
+            // console.log("processedInputValues.topBorder " + visualisationData.visualTopBorder)
             if(!isNaN(visualisationData.visualBottomBorder) && !isNaN(visualisationData.visualTopBorder)){
         
             data.sort(function(a, b) {
@@ -257,7 +257,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
             daten.sort(function(a, b){return b-a});
         
             //Lieber im Schleifendurchlauf immer 2 Schritte machen
-            if(includingGaps){
+            if(isIncludingGaps){
                 länge = daten.length/2;
             }else{
                 länge=daten.length-1;
@@ -275,21 +275,10 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
             }
             // console.log("Blockmap size "+visualisationData.blockMap.size);
 
-            let blocks,blocks_w_params;
-            blocks=[],blocks_w_params=[];
+            let blocks,blocks_scaled;
+            blocks=[],blocks_scaled=[];
             for (let index = 0; index < visualisationData.blockMap.size; index++) {
                 //Aufruf der Visualisierungs-Parameter-Berechnungsfunktionen
-                // visualizationParameters ={
-                //     scaledBlockStart :0,
-                //     scaledBlockEnd :0
-                // };
-                // let visualizationParametersSpecialCases;
-                // visualizationParametersSpecialCases ={
-                //     scaledBlockStart :0,
-                //     scaledBlockEnd :0
-                // };
-                // console.log("left Border raw: "+ visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).leftBorder);
-                // console.log("right Border raw: "+ visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).rightBorder);
                 let visualizationParameters;
                 visualizationParameters = calculateBlockParameters(
                     visualisationData.blockMap.get(visualisationData.blockMap.size-(index+1)).leftBorder,
@@ -308,97 +297,52 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                     isTopInfinite,
                     index,
                     visualisationData.blockMap.size,
-                    isIncludingTop,
-                    processedInputValues.includingBottom,
-                    processedInputValues.includingGaps,
-                    w);
+                    processedInputValues.isIncludingTop,
+                    processedInputValues.isIncludingBottom,
+                    processedInputValues.isIncludingGaps,
+                    w
+                    );
 
-
-                // console.log("left border scaled: "+ visualizationParameters.intervalStart);
-                // console.log("right border scaled: "+ visualizationParameters.intervalEnd);
                 blocks.push(visualizationParameters);
-                blocks_w_params.push(visualizationParametersSpecialCases);
+                blocks_scaled.push(visualizationParametersSpecialCases);
             }
 
-            console.log(blocks);
-            console.log(blocks_w_params);
+            // console.log("blocks");
+            // console.log(blocks);
+            // console.log("blocks_scaled");
+            // console.log(blocks_scaled);
 
-
-            for (let index = 0; index < länge; index++) {    
+            for (let i = 0; i < blocks.length; i++) {
+                const blockData = blocks[i];
+                const scaledBlockData = blocks_scaled [i];
                 
-                data2.push(daten.pop());
-
-                let differenzStartEnde = Math.abs(visualisationData.visualTopBorder-visualisationData.visualBottomBorder);
-                let wgraph = w-50;
-                //unteres Ende des Intervalls
-                let startskaliert= 25+(data2[0]-visualisationData.visualBottomBorder)*((wgraph/(differenzStartEnde)));
-                //oberes Ende des Intervalls
-                let endeskaliert = 25+(daten[daten.length-1]-visualisationData.visualBottomBorder)*((wgraph/(differenzStartEnde)));
-
-                let stepSize = ((wgraph)/(differenzStartEnde));
-                //Schrittgröße zur Ermittlung der oberen und unteren Begrenzung sollte 
-                //zur Übersichtlichkeit nie weniger als 3% der Gesamtbreite sein
-                if(stepSize<wgraph*(3/100)){
-                    stepSize=wgraph*(3/100);
-                }
-                // if (obenoffen&& (!includingGaps||index!=0)) {
-                    if (isTopInfinite&& (index===länge-1)) {
-                    endeskaliert = w;
-                }
-                if (isBottomInfinite && (index===0)) {
-                    startskaliert = 0;
-                }
-                
-                if(index ===länge-1 && !isIncludingTop &&!isTopInfinite){
-                    endeskaliert -= (stepSize/2);
-                }
-                if(index===0 && !processedInputValues.includingBottom && !isBottomInfinite){
-                    startskaliert += stepSize/2;
-                }
-
-                //Wenn es eine Lücke gibt
-                if (index !==länge-1 ) {
-                    endeskaliert -= stepSize/2;
-                }            
-                if( index!==0){
-                    startskaliert += stepSize/2;
-                }
-        
-        
-                let breiteSkaliert = Math.abs(endeskaliert - startskaliert)
-        
                 svg.selectAll("Bar")
                     .data(daten)
                     .enter()
                     .append("rect")
-                    .attr("x", startskaliert)
+                    .attr("x", scaledBlockData.intervalStart)
                     .attr("y", 2)
-                    .attr("width", breiteSkaliert)
+                    .attr("width", scaledBlockData.scaledWidth)
                     .attr("height", 48)
                     .attr("opacity", 50)
                     .attr("fill", green);
-                    if(!isBottomInfinite||!(!includingGaps||index===0)){
+                    if(!isBottomInfinite||!(!isIncludingGaps||i===0)){
                         //Linke Grenze des Balken wird mit einer dunkelgrünen Klammer markiert
                     svg.append('path')
-                        .attr('d', d3.line()([[startskaliert+10,2], [startskaliert, 2], [startskaliert, 50], [startskaliert+10, 50]]))
+                        .attr('d', d3.line()([[scaledBlockData.intervalStart+10,2], [scaledBlockData.intervalStart, 2], [scaledBlockData.intervalStart, 50], [scaledBlockData.intervalStart+10, 50]]))
                         .attr('stroke', dark_green)
                         .attr('stroke-width', 4)
                         .attr('fill', 'none');
                     }
                     //Rechte Grenze des Balken wird mit einer dunkelgrünen Klammer markiert
-                    if(!isTopInfinite||!(!includingGaps||index===länge-1)){
+                    if(!isTopInfinite||!(!isIncludingGaps||i===blocks.length-1)){
                         svg.append('path')
-                        .attr('d', d3.line()([[endeskaliert-10,2], [endeskaliert, 2], [endeskaliert, 50], [endeskaliert-10, 50]]))
+                        .attr('d', d3.line()([[scaledBlockData.intervalEnd-10,2], [scaledBlockData.intervalEnd, 2], [scaledBlockData.intervalEnd, 50], [scaledBlockData.intervalEnd-10, 50]]))
                         .attr('stroke', dark_green)
                         .attr('stroke-width', 4)
                         .attr('fill', 'none');
                     }
-                        
-        
-                daten.pop();
-                data2.pop();
             }
-        
                 let tick = visualisationData.visualTopBorder-visualisationData.visualBottomBorder;
                 var x = d3.scaleLinear()
                 .domain([visualisationData.visualBottomBorder, visualisationData.visualTopBorder])
@@ -408,7 +352,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                     tick=10;
                 }
                 if(isTopInfinite){
-                    if (includingGaps) {
+                    if (isIncludingGaps) {
                         
                     }else{
                         tick=2;
@@ -417,7 +361,7 @@ async function drawSvg(svgRef: React.RefObject<SVGSVGElement>,name) {
                         xAxisGenerator.tickValues([visualisationData.visualBottomBorder,visualisationData.visualTopBorder]);
                     }
                 }else if (isBottomInfinite) {
-                    if (includingGaps) {
+                    if (isIncludingGaps) {
 
                     }else{
                         tick=3;
@@ -487,7 +431,7 @@ function calculateBlockParameters(startValue,endValue,drawingWidth,visStartValue
     return blockParameters;
 }
 
-function checkSpecialCases(startValue,endValue,setpWidth,isBottomInfinite,isTopInfinite,index,numberOfValues,isIncludingTopValue,isIncludingBottomValue,isIncludingGaps,drawingWidth){
+function checkSpecialCases(startValue,endValue,setpWidth,isBottomInfinite,isTopInfinite,index,numberOfValues,isIncludingTopValue,isisIncludingBottomValue,isisIncludingGaps,drawingWidth){
     const blockParameters = {};
     let isLastIndex = false;
     if (index === numberOfValues-1) {
@@ -514,7 +458,7 @@ function checkSpecialCases(startValue,endValue,setpWidth,isBottomInfinite,isTopI
     }
     //Wenn es der erste Block ist, dieser unten begrenzt ist, aber der Wert nicht in den Wertebereich
     //Eingeschlossen wird, wird die Grenze um einen halben Schritt nach rechts verschoben
-    if (!isBottomInfinite && isFirstIndex && !isIncludingBottomValue) {
+    if (!isBottomInfinite && isFirstIndex && !isisIncludingBottomValue) {
         blockParameters['intervalStart']=startValue+setpWidth/2;
     }
     //für den Fall, dass es eine Lücke im Wertebereich gibt, werden die Start-Koordinaten aller Blöcke, die nicht 
@@ -527,6 +471,8 @@ function checkSpecialCases(startValue,endValue,setpWidth,isBottomInfinite,isTopI
     if (!isLastIndex) {
         blockParameters['intervalEnd']=endValue-setpWidth/2;
     }
+
+    blockParameters['scaledWidth'] = Math.abs(blockParameters['intervalStart']-blockParameters['intervalEnd']);
 
     return blockParameters;
 }
